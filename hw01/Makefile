@@ -3,7 +3,7 @@
 # make clean	Deleate all binaries
 
 CC=gcc
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -g -O3
 
 all: hw1q4.out hw1q5.out
 
