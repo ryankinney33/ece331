@@ -1,0 +1,11 @@
+1.
+    (a) I used the tutorial at https://www.openvim.com/
+    (b) I completed the tutorial.
+
+2.
+    I wrote the entire homework in vim.
+
+3.
+    :r log.c
+
+4. 
