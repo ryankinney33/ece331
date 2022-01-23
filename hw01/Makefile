@@ -5,7 +5,7 @@
 CC=gcc
 CFLAGS = -Wall -O3
 
-all: hw1q4 hw1q5
+all: hw1q4.out hw1q5.out
 
 hw1q4.out: hw1q4.o
 	$(CC) hw1q4.o -o hw1q4.out
