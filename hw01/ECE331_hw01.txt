@@ -88,5 +88,5 @@ alias grep='grep -E'
 echo "alias grep='grep -E'" >> ~/.bashrc
 
 8.
-enscript ECE331_hw01.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10 \
--p- | ps2pdf - /mnt/d/output.pdf
+    I used the following command:
+enscript ECE331_hw01.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
