@@ -15,7 +15,7 @@ hw1q5.out: hw1q5.o
 
 # Rule for making all the object files
 %.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Object file prerequisites?
 hw1q4.o: hw1q4.c
