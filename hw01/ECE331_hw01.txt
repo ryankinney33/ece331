@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+
 4c.
     To pass 'The Maze Runner.mp4' to the program, the following is used:
 ./args 'The Maze Runner.mp4'
