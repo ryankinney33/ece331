@@ -1,0 +1,25 @@
+1.
+
+2.
+
+3.
+    Done.
+4.
+    The following command accomplishes the task:
+mv xyz vader
+
+5.
+    The following command works:
+cp vader galaxy
+
+6a.
+
+6b.
+
+7.
+
+8.
+
+9.
+    I used the following command:
+enscript ECE331_hw02.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
