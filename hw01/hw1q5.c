@@ -12,12 +12,17 @@
  */
 int main(int argc, char *argv[])
 {
-	uint32_t size;
+	int32_t size;
 
 	/* Get the size of the array */
 	if (argc > 1) { /* Ensure an argument was passed to the program */
 		size = atoi(argv[1]);
-		size = (size > 16000000) ? 16000000 : size;
+
+		if (size < 0) { /* Negative-sized array? */
+			printf("0\n");
+			return 0;
+		}
+		size = (size > 16000000) ? 16000000 : size; /* Size limit */
 	} else {
 		printf("0\n");
 		return 0;
