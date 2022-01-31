@@ -1,6 +1,12 @@
 1.
+    The longest string length allowed was 131071 characters
+(131072 bytes including the null-terminator).
 
 2.
+    sda1:  type = block special, major number = 8, minor = 0
+    null:  type = character special, major number = 1, minor = 3
+    mem:   type = character special, major number = 1, minor = 1
+    loop0: type = block special, major number = 7, minor = 0
 
 3.
     Done.
@@ -13,9 +19,10 @@ mv xyz vader
 cp vader galaxy
 
 6a.
+    chmod 143 voldemort
 
 6b.
-
+    chmod u+w-x,g-r+w+x,o+r+w-x voldemort
 7.
 
 8.
