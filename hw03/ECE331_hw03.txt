@@ -1,0 +1,19 @@
+5
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install flex libssl-dev
+    cd /usr/src
+    sudo git clone https://github.com/raspberrypi/linux.git
+    cd linux
+    uname -r
+    sudo git checkout rpi-5.10.y
+    sudo mv ../linux ../linux-`uname -r`
+    sudo make mrproper
+    sudo modprobe configs
+    gunzip -c /proc/config.gz > /tmp/.config
+    sudo mv /tmp/.config .config
+    sudo wget https://raw.githubusercontent.com/raspberrypi/\
+firmware/master/extra/Module7l.symvers -O /boot/Module7l.symvers
+    sudo ln -s /boot/Module7l.symvers Module.symvers
+    sudo make modules_prepare
+    sudo ln -s /lib/modules/5.10.94-v7l+ build
+    sudo ln -s build /lib/modules/5.10.94-v7l+/source
