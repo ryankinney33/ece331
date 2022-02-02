@@ -9,12 +9,13 @@
  * the command line. If stat fails to get information on a file,
  * an error message is printed, and the file is skipped.
  *
- * If no names are passed on the command line, the program prints 0.
+ * If no names are passed on the command line, the program prints 0,
+ * after all, 0 files use 0 bytes.
  */
 int main(int argc, char *argv[])
 {
 	struct stat file; /* Holds the information from stat() */
-	uint64_t size = 0; /* Total size of the files in bytes */
+	long long size = 0; /* Total size of the files in bytes */
 	int i;
 
 	/* argv[0] contains the name of the program; ignore it */
