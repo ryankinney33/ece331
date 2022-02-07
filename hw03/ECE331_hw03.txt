@@ -1,4 +1,12 @@
-5
+1.
+2a.
+2b.
+3a.
+    find /usr/lib -maxdepth 1 -type f \( -name "?" -o -name "??" -o -name "???" \) | wc -l
+3b.
+    There were 0 regular files with 1, 2, or 3 characters in /usr/lib
+4.
+5.
     sudo apt update && sudo apt upgrade -y
     sudo apt install flex libssl-dev
     cd /usr/src
@@ -17,3 +25,5 @@ firmware/master/extra/Module7l.symvers -O /boot/Module7l.symvers
     sudo make modules_prepare
     sudo ln -s /lib/modules/5.10.94-v7l+ build
     sudo ln -s build /lib/modules/5.10.94-v7l+/source
+6.
+	enscript ECE331_hw03.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
