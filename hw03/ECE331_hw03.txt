@@ -1,10 +1,36 @@
 1.
+# Usage
+# make		Compile the binary
+# make clean	Remove all binaries and object files
+TARGET = hw1q5
+OBJS = hw1q5.o
+CC = gcc
+CFLAGS = -Wall -g
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) -o $(TARGET)
+
+clean:
+	rm -f $(TARGET) $(OBJS) core*
+
 2a.
+    The program for homework 1 question 5 was compiled without optimization
+    enabled.
 2b.
 3a.
-    stat -c '%F %n' /usr/lib/* | grep -cE 'regular file /usr/lib/.{1,3}$'
+    The following command counts regular files with 1, 2, or 3 characters
+    in '/usr/lib'. Note: this does not search all the subdirectories in
+    '/usr/lib' recursively. In order to search recursively, add 'R' to the
+    '-lqa' in the command. The regular expression looks for lines that start
+    with '-' meaning the file is a regular file. It then looks for lines that
+    end with a space followed by 1, 2, or 3 characters.
+/usr/bin/ls -lqA /usr/lib | grep -cE '^-.+ .{1,3}$'
+
 3b.
     There were 0 regular files with 1, 2, or 3 characters in /usr/lib
+
 4.
 5.
     sudo apt update && sudo apt upgrade -y
