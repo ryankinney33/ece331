@@ -302,8 +302,8 @@ int main(int argc, char *argv[])
     sudo git checkout rpi-5.10.y
     sudo make mrproper
     sudo modprobe configs
-    gunzip -c /proc/config.gz > /tmp/.config
-    sudo mv /tmp/.config .config
+    gunzip -c /proc/config.gz > ~/.config
+    sudo mv ~/.config .config
     sudo wget https://raw.githubusercontent.com/raspberrypi/\
 firmware/master/extra/Module7l.symvers -O /boot/Module7l.symvers
     sudo ln -s /boot/Module7l.symvers Module.symvers
