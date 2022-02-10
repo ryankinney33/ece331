@@ -16,9 +16,76 @@ clean:
 	rm -f $(TARGET) $(OBJS) core*
 
 2a.
-    The program for homework 1 question 5 was compiled without optimization
-    enabled.
+    The program for homework 1 question 5 was compiled with the following command:
+	gcc -o hw1q5 -g -Wall hw1q5.c
+    The resulting binary did NOT combine the two loops together.
+
 2b.
+    The assembly for the program was obtained with the following command:
+	objdump -l --disassemble=main ./hw1q5 > temp.asm
+    The resulting file, temp.asm, contains the assembly instructions for the program,
+    but also includes the line numbers in the C source file that correspond
+    to the instuctions. In the source file compiled for this problem, the two
+    loops begin on lines 40 and 43. In the assembly, there were three markers each for
+    those two lines. The first sets the value of the iterator to 0 before branching
+    into the loop, the second increments the iterator, and the third performs the
+    comparison to see if the loop should continue. Once the first loop is completed,
+    the next instructions set the iterator for the second loop before branching into it.
+    The relevant output from the above command is shown below.
+
+/home/pi/Documents/ece331/hw03/hw1q5.c:40
+   105f0:	e3a03000 	mov	r3, #0
+   105f4:	e50b3008 	str	r3, [fp, #-8]
+   105f8:	ea00000d 	b	10634 <main+0xe4>
+/home/pi/Documents/ece331/hw03/hw1q5.c:31
+   105fc:	e59f00ac 	ldr	r0, [pc, #172]	; 106b0 <main+0x160>
+   10600:	ebffff7e 	bl	10400 <puts@plt>
+/home/pi/Documents/ece331/hw03/hw1q5.c:32
+   10604:	e3a03000 	mov	r3, #0
+   10608:	ea000025 	b	106a4 <main+0x154>
+/home/pi/Documents/ece331/hw03/hw1q5.c:41 (discriminator 3)
+   1060c:	ebffff8a 	bl	1043c <rand@plt>
+   10610:	e1a01000 	mov	r1, r0
+   10614:	e51b3008 	ldr	r3, [fp, #-8]
+   10618:	e51b2014 	ldr	r2, [fp, #-20]	; 0xffffffec
+   1061c:	e0823003 	add	r3, r2, r3
+   10620:	e6ef2071 	uxtb	r2, r1
+   10624:	e5c32000 	strb	r2, [r3]
+/home/pi/Documents/ece331/hw03/hw1q5.c:40 (discriminator 3)
+   10628:	e51b3008 	ldr	r3, [fp, #-8]
+   1062c:	e2833001 	add	r3, r3, #1
+   10630:	e50b3008 	str	r3, [fp, #-8]
+/home/pi/Documents/ece331/hw03/hw1q5.c:40 (discriminator 1)
+   10634:	e51b2008 	ldr	r2, [fp, #-8]
+   10638:	e51b3010 	ldr	r3, [fp, #-16]
+   1063c:	e1520003 	cmp	r2, r3
+   10640:	bafffff1 	blt	1060c <main+0xbc>
+/home/pi/Documents/ece331/hw03/hw1q5.c:43
+   10644:	e3a03000 	mov	r3, #0
+   10648:	e50b3008 	str	r3, [fp, #-8]
+   1064c:	ea00000a 	b	1067c <main+0x12c>
+/home/pi/Documents/ece331/hw03/hw1q5.c:44 (discriminator 3)
+   10650:	e51b3008 	ldr	r3, [fp, #-8]
+   10654:	e51b2014 	ldr	r2, [fp, #-20]	; 0xffffffec
+   10658:	e0823003 	add	r3, r2, r3
+   1065c:	e5d33000 	ldrb	r3, [r3]
+   10660:	e1a02003 	mov	r2, r3
+   10664:	e51b300c 	ldr	r3, [fp, #-12]
+   10668:	e0833002 	add	r3, r3, r2
+   1066c:	e50b300c 	str	r3, [fp, #-12]
+/home/pi/Documents/ece331/hw03/hw1q5.c:43 (discriminator 3)
+   10670:	e51b3008 	ldr	r3, [fp, #-8]
+   10674:	e2833001 	add	r3, r3, #1
+   10678:	e50b3008 	str	r3, [fp, #-8]
+/home/pi/Documents/ece331/hw03/hw1q5.c:43 (discriminator 1)
+   1067c:	e51b2008 	ldr	r2, [fp, #-8]
+   10680:	e51b3010 	ldr	r3, [fp, #-16]
+   10684:	e1520003 	cmp	r2, r3
+   10688:	bafffff0 	blt	10650 <main+0x100>
+/home/pi/Documents/ece331/hw03/hw1q5.c:46
+   1068c:	e51b0014 	ldr	r0, [fp, #-20]	; 0xffffffec
+   10690:	ebffff54 	bl	103e8 <free@plt>
+
 3a.
     The following command counts regular files with 1, 2, or 3 characters
     in '/usr/lib'. Note: this does not search all the subdirectories in

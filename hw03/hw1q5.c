@@ -13,6 +13,10 @@
 int main(int argc, char *argv[])
 {
 	int32_t size;
+	time_t t;
+	uint8_t *array;
+	int i;
+	uint32_t sum = 0;
 
 	/* Get the size of the array */
 	if (argc > 1) { /* Ensure an argument was passed to the program */
@@ -28,21 +32,19 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	time_t t; /* Used to set the seed for the random number generator */
 	srand(time(&t));
 
-
 	/* Create and sum the array */
-	uint8_t *array = malloc(size*sizeof(uint8_t));
+	array = malloc(size*sizeof(uint8_t));
 
-	for (int i = 0; i < size; ++i)
-		array[i] = (unsigned)rand() % 255;
+	for (i = 0; i < size; ++i)
+		array[i] = (unsigned)rand();
 
-	uint32_t sum = 0;
-	for (int i = 0; i < size; ++i)
+	for (i = 0; i < size; ++i)
 		sum += array[i];
 
 	free(array);
+
 
 	printf("%u\n",sum);
 	return 0;
