@@ -99,15 +99,207 @@ clean:
     There were 0 regular files with 1, 2, or 3 characters in /usr/lib
 
 4.
+/* FILE: gpio_q4.h */
+#ifndef _GPIO_Q4_H_
+#define _GPIO_Q4_H_
+
+/* Exports the passed GPIO pin */
+int gpio_export(int pin);
+
+/* Unexports the passed GPIO pin */
+int gpio_unexport(int pin);
+
+/* Sets the passed pin to either high or low */
+int gpio_value(int pin, int value);
+
+/* Sets the passed pin as input or output */
+int gpio_direction(int pin, char *direction);
+
+#endif /* _GPIO_Q4_H_ */
+
+/* FILE: gpio_q4.c */
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#include "gpio_q4.h"
+
+/* Exports the passed GPIO pin */
+int gpio_export(int pin)
+{
+	/* Open the file to export the GPIO pin */
+	int fd = open("/sys/class/gpio/export", O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	}
+
+	/* Write the pin number to export it and perform error checking */
+	if (dprintf(fd, "%d", pin) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* Unexports the passed GPIO pin */
+int gpio_unexport(int pin)
+{
+	/* Open the file to unexport the GPIO pin */
+	int fd = open("/sys/class/gpio/unexport", O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	}
+
+	/* Write the pin number to unexport it and perform error checking */
+	if (dprintf(fd, "%d", pin) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* Sets the passed pin to either high or low */
+int gpio_value(int pin, int value)
+{
+	char path[50]; /* Holds the path of the file to be opened */
+
+	if (value != 0 && value != 1)
+		return 1; /* Sanity check */
+
+	/* Generate the path depending on the passed pin number */
+	snprintf(path, 50, "/sys/class/gpio/gpio%d/value", pin);
+
+	/* Open the file and attempt to write the value */
+	int fd = open(path, O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	} else if (dprintf(fd, "%d", value) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* Sets the passed pin as input or output */
+int gpio_direction(int pin, char *direction)
+{
+	char path[50]; /* Holds the path of the file to be opened */
+
+	/* Perform some error checking */
+	if (direction == NULL || (strcmp(direction, "out") != 0
+				&& strcmp(direction, "in") != 0)) {
+		return 1;
+	}
+
+	/* Generate the path depending on the passed pin number */
+	snprintf(path, 50, "/sys/class/gpio/gpio%d/direction", pin);
+
+	/* Open the file and attempt to write the direction */
+	int fd = open(path, O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	}
+	if (dprintf(fd, "%s", direction) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* FILE: main.c */
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <signal.h>
+#include <unistd.h>
+#include "gpio_q4.h"
+
+#define PIN_NUM 17
+
+static int blink = 1;
+
+/* Clears the blink flag to exit the program cleanly */
+void int_handler()
+{
+	blink = 0;
+}
+
+/*
+ * Sets the GPIO corresponding to PIN_NUM as an output
+ * and toggles the pin with a frequency of approximately 1 Hz.
+ * Uses the deprecated gpio sysfs interface.
+ */
+int main(int argc, char *argv[])
+{
+	/* Try to trap SIGINT for graceful program exit */
+	struct sigaction ctrlc;
+	ctrlc.sa_handler = int_handler;
+	if (sigaction(SIGINT, &ctrlc, NULL) < 0) {
+		fprintf(stderr, "Error from sigaction: %s\n", strerror(errno));
+		return 1;
+	}
+
+	/* Initialize GPIO17 for output */
+	if (gpio_export(PIN_NUM)) {
+		fprintf(stderr, "Error exporting GPIO%d: %s\n",
+				PIN_NUM, strerror(errno));
+		return 1;
+	}
+	usleep(1000); /* short delay */
+	if (gpio_direction(PIN_NUM, "out")) {
+		fprintf(stderr, "Error setting direction: %s\n",
+				strerror(errno));
+		gpio_unexport(PIN_NUM);
+		return 1;
+	}
+
+	/* Set the pin high, wait 0.5 secs, set the pin low, wait 0.5 secs */
+	while (blink) {
+		if (gpio_value(PIN_NUM, 1)) {
+			fprintf(stderr, "Error setting value: %s\n",
+					strerror(errno));
+			gpio_unexport(PIN_NUM);
+			return 1;
+		}
+		usleep(500000);
+		if (gpio_value(PIN_NUM, 0)) {
+			fprintf(stderr, "Error setting value: %s\n",
+					strerror(errno));
+			gpio_unexport(PIN_NUM);
+			return 1;
+		}
+		usleep(500000);
+	}
+
+	/* Done blinking; Unexport the GPIO pin and exit the program */
+	if (gpio_unexport(PIN_NUM) < 0) {
+		fprintf(stderr, "Error unexporting GPIO%d: %s\n",
+				PIN_NUM, strerror(errno));
+		return 1;
+	}
+	printf("\n");
+
+	return 0;
+}
+
 5.
     sudo apt update && sudo apt upgrade -y
     sudo apt install flex libssl-dev
     cd /usr/src
     sudo git clone https://github.com/raspberrypi/linux.git
-    cd linux
-    uname -r
+    sudo mv linux linux-`uname -r`
+    cd linux-`uname -r`
     sudo git checkout rpi-5.10.y
-    sudo mv ../linux ../linux-`uname -r`
     sudo make mrproper
     sudo modprobe configs
     gunzip -c /proc/config.gz > /tmp/.config
@@ -116,7 +308,8 @@ clean:
 firmware/master/extra/Module7l.symvers -O /boot/Module7l.symvers
     sudo ln -s /boot/Module7l.symvers Module.symvers
     sudo make modules_prepare
-    sudo ln -s /lib/modules/5.10.94-v7l+ build
-    sudo ln -s build /lib/modules/5.10.94-v7l+/source
+    sudo ln -s `pwd` /lib/modules/`uname -r`/build
+    sudo ln -s /lib/modules/`uname -r`/build /lib/modules/`uname -r`/source
+
 6.
 	enscript ECE331_hw03.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10

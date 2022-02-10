@@ -1,14 +1,12 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-
 #include <fcntl.h>
 #include <unistd.h>
 
 #include "gpio_q4.h"
 
-
+/* Exports the passed GPIO pin */
 int gpio_export(int pin)
 {
 	/* Open the file to export the GPIO pin */
@@ -27,6 +25,7 @@ int gpio_export(int pin)
 	return 0;
 }
 
+/* Unexports the passed GPIO pin */
 int gpio_unexport(int pin)
 {
 	/* Open the file to unexport the GPIO pin */
@@ -45,6 +44,7 @@ int gpio_unexport(int pin)
 	return 0;
 }
 
+/* Sets the passed pin to either high or low */
 int gpio_value(int pin, int value)
 {
 	char path[50]; /* Holds the path of the file to be opened */
@@ -68,6 +68,7 @@ int gpio_value(int pin, int value)
 	return 0;
 }
 
+/* Sets the passed pin as input or output */
 int gpio_direction(int pin, char *direction)
 {
 	char path[50]; /* Holds the path of the file to be opened */
