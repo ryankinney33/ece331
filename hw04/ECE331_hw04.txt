@@ -30,8 +30,8 @@
     In the string: '101.1aa 101a 111', only 101 and 111 match. 1aa, and 101a do not match.
 
 3b.
-    The minimum match is a 0 or 1 that is next to a non-word character,
-    such as before the first character of a string, after the last character, or punctuation.
+    The minimum match is a 0 or 1 at a word boundary, such as before the first character of a string,
+    after the last character, next to punctuation, or whitespace.
     For example:
 	1
 
