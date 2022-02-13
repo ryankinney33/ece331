@@ -1,0 +1,27 @@
+1.
+    The command I used was:
+	grep -Eh '^[0-9]+$' [0-9][0-9]
+    The RE matches a sequence of 1 or more consecutive digits. The line
+    must start with the first number of the sequence and end with the last.
+    The files searched are all files in the current directory with a file name
+    consisting of exactly two digits.
+
+2a.
+    The minimum match is a lowercase letter from a-z, followed by a
+    non-line-terminating character, followed by 0. An example would be:
+	ab0
+
+2b.
+    The minimum match is a line consisting of exactly one character. For example:
+	5
+
+2c.
+    The minimum match is a single digit. For example:
+	4
+
+2d.
+    The group in the RE matches 1 or more characters that are not lowercase
+    letters from a-z. However, the RE matches 0 or more occurrences of that group.
+    Therefore, the minimum match is a blank line with a line-terminator.
+
+
