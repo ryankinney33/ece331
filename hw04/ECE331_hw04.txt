@@ -24,4 +24,14 @@
     letters from a-z. However, the RE matches 0 or more occurrences of that group.
     Therefore, the minimum match is a blank line with a line-terminator.
 
+3a.
+    The below RE matches binary numbers anchored at word boundaries.
+	\b[0-1]+\b
+    In the string: '101.1aa 101a 111', only 101 and 111 match. 1aa, and 101a do not match.
+
+3b.
+    The minimum match is a 0 or 1 that is next to a non-word character,
+    such as before the first character of a string, after the last character, or punctuation.
+    For example:
+	1
 
