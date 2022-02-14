@@ -10,24 +10,27 @@ except IndexError:
 
 # Extract the requested file from the URL
 pieces = url_string.split('/')
-fname = pieces[-1].split('?')[0] # also remove queries from the file name
+fname = pieces[-1] # also remove queries from the file name
 
-# There was no protocol, like http:// entered, or file name listed.
-# e.g, the requested URL was of the form 'google.com'
+# Check if no protocol, like http://, was entered and no file name was requested
 # Insert http as the protocol and assume the requested file was index.html
 if len(pieces) == 1:
     url_string = 'http://' + url_string
     fname = 'index.html'
 
-# Check if there was no requested file name (URL ends in '/')
-elif not fname:
+# Check if there was a file name, but no protocol
+elif pieces[1]:
+    url_string = 'http://' + url_string
+
+# Check if there was no requested file name
+if not fname:
     fname = 'index.html'
 
 print('Fetching:', url_string)
 while True:
     # Try to read the URL and write the received content
-    r = requests.get(url_string)
     try:
+        r = requests.get(url_string)
         r.raise_for_status() # Raise an exception for an HTTP Error
 
         with open(fname, 'wb') as f:
@@ -40,4 +43,3 @@ while True:
         fname = 'index.html'
     except Exception as err:
         sys.exit(str(err))
-
