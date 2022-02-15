@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys
-
+import matplotlib.pyplot as plt
 
 # Dictionary to hold word lengths
 word_len = dict()
@@ -11,7 +11,7 @@ maxlen = 0
 try:
     with open('/usr/share/dict/words', 'r') as f:
         for word in f.readlines():
-            size = len(word)-1 # Adjust for the newline
+            size = len(word) - 1 # Adjust for the newline
 
             if size in word_len:
                 word_len[size] += 1
@@ -28,5 +28,14 @@ except Exception as err:
     print(error)
     sys.exit(str(err))
 
+# Print some info then plot the data
 print('Word:',longest_word)
 print('Length:',maxlen)
+
+plt.bar(list(word_len.keys()), list(word_len.values()), width=1)
+plt.grid()
+plt.title('Word lengths')
+plt.xlabel('Word length, unitless')
+plt.ylabel('Number of Words, unitless')
+plt.show()
+

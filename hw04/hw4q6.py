@@ -10,7 +10,7 @@ except IndexError:
 
 # Extract the requested file from the URL
 pieces = url_string.split('/')
-fname = pieces[-1] # also remove queries from the file name
+fname = pieces[-1].split('?')[0] # also remove queries from the file name
 
 # Check if no protocol, like http://, was entered and no file name was requested
 # Insert http as the protocol and assume the requested file was index.html
@@ -38,8 +38,8 @@ while True:
         break
 
     # If the requested URL is a directory, add a '/' to the end of the URL
-    except IsADirectoryError:
-        url_string = url_string + '/'
-        fname = 'index.html'
+#    except IsADirectoryError:
+#        url_string = url_string + '/'
+#        fname = 'index.html'
     except Exception as err:
         sys.exit(str(err))
