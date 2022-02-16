@@ -13,6 +13,7 @@ try:
         for word in f.readlines():
             size = len(word) - 1 # Adjust for the newline
 
+            # Update the word-length count
             if size in word_len:
                 word_len[size] += 1
             else:
@@ -25,7 +26,6 @@ try:
 
 # An error occurred.
 except Exception as err:
-    print(error)
     sys.exit(str(err))
 
 # Print some info then plot the data

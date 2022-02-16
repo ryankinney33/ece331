@@ -38,8 +38,8 @@ while True:
         break
 
     # If the requested URL is a directory, add a '/' to the end of the URL
-#    except IsADirectoryError:
-#        url_string = url_string + '/'
-#        fname = 'index.html'
+    except IsADirectoryError:
+        url_string = url_string + '/'
+        fname = 'index.html'
     except Exception as err:
         sys.exit(str(err))
