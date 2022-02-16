@@ -4,7 +4,8 @@
     The RE matches a sequence of 1 or more consecutive digits. The line
     must start with the first number of the sequence and end with the last.
     The files searched are all files in the current directory with a file name
-    consisting of exactly two digits.
+    consisting of exactly two digits. The 'h' argument to grep suppresses the file
+    name being printed in the output.
 
 2a.
     The minimum match is a lowercase letter from a-z, followed by a
@@ -34,4 +35,30 @@
     after the last character, next to punctuation, or whitespace.
     For example:
 	1
+4.
+    a.
+	The below RE matches even integers. It matches consecutive digits as long
+	as the last digit in the sequence is 0, 2, 4, 6, or 8. The number is located
+	at a word boundary position, which includes being surrounded by whitespace or
+	other punctuation that may be used in some kind of data file.
+	    \b[0-9]*[2468]\b
+    b.
+	The minimum match is a line with a single even digit, such as 2
 
+5.
+    a.
+	A description of floating point constants is outlined in section 6.4.4.2 of the
+	ISO/IEC 9899 Revision of the C standard from 2011 (N1570). A decimal-floating-constant
+	is comprised of an optional sign, a fractional-constant, an optional exponent-part,
+	and an optional floating-suffix.
+	The sign is a + or -
+	The fractional constant is formed by the following:
+	    optional digit-sequence . digit-sequence.
+	The exponent-part is formed by either of the following:
+	    e optional-sign digit-sequence
+	    E optional-sign digit-sequence
+	The floating-suffix is one of the following: l L f F
+	Consolidating this information into an RE yielded the following:
+	    [+-]?([0-9]*\.)?[0-9]+([eE][+-]?[0-9]+)?[fFlL]?
+    b.
+	The minimum match is a single digit, such as 2
