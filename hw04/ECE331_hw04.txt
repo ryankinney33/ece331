@@ -153,4 +153,4 @@ plt.ylabel('Number of Words, unitless')
 plt.show()
 
 8.
-    enscript ECE331_hw03.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
+    enscript ECE331_hw04.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
