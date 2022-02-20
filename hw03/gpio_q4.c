@@ -48,6 +48,8 @@ int gpio_unexport(int pin)
 int gpio_value(int pin, int value)
 {
 	char path[50]; /* Holds the path of the file to be opened */
+	int fd;
+
 
 	if (value != 0 && value != 1)
 		return 1; /* Sanity check */
@@ -56,7 +58,7 @@ int gpio_value(int pin, int value)
 	snprintf(path, 50, "/sys/class/gpio/gpio%d/value", pin);
 
 	/* Open the file and attempt to write the value */
-	int fd = open(path, O_WRONLY);
+	fd = open(path, O_WRONLY);
 	if (fd < 0) { /* error checking */
 		return 1;
 	} else if (dprintf(fd, "%d", value) < 0) {
@@ -72,6 +74,7 @@ int gpio_value(int pin, int value)
 int gpio_direction(int pin, char *direction)
 {
 	char path[50]; /* Holds the path of the file to be opened */
+	int fd;
 
 	/* Perform some error checking */
 	if (direction == NULL || (strcmp(direction, "out") != 0
@@ -83,7 +86,7 @@ int gpio_direction(int pin, char *direction)
 	snprintf(path, 50, "/sys/class/gpio/gpio%d/direction", pin);
 
 	/* Open the file and attempt to write the direction */
-	int fd = open(path, O_WRONLY);
+	fd = open(path, O_WRONLY);
 	if (fd < 0) { /* error checking */
 		return 1;
 	}

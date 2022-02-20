@@ -1,5 +1,5 @@
-#ifndef _GPIO_Q4_H_
-#define _GPIO_Q4_H_
+#ifndef GPIO_Q4_H
+#define GPIO_Q4_H
 
 /* Exports the passed GPIO pin */
 int gpio_export(int pin);
@@ -13,4 +13,4 @@ int gpio_value(int pin, int value);
 /* Sets the passed pin as input or output */
 int gpio_direction(int pin, char *direction);
 
-#endif /* _GPIO_Q4_H_ */
+#endif /* GPIO_Q4_H */
