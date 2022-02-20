@@ -50,7 +50,6 @@ int gpio_value(int pin, int value)
 	char path[50]; /* Holds the path of the file to be opened */
 	int fd;
 
-
 	if (value != 0 && value != 1)
 		return 1; /* Sanity check */
 
