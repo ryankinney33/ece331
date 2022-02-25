@@ -32,6 +32,18 @@ static int LCD_gpio_init(const struct LCD *disp)
 	return 0; // No problems encountered.
 }
 
+/* Clocks the LCD display to write the data */
+static int LCD_clock(const struct LCD *disp, unsigned int t)
+{
+	// Pull the E pin high to send the instruction
+	if (gpio_value(disp->E, 1))
+		return 1;
+	usleep(t); // Wait the required time for the instruction execution
+
+	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+}
+
+
 /*
  * Sets the RS and data GPIO then sets the E pin to write to the display.
  * The bits of val represent RS,D7,D6,D5,D4
@@ -50,12 +62,7 @@ static int LCD_pin_set(const struct LCD *disp, char val, unsigned int t)
 	if (r)
 		return 1; // Error checking
 
-	// Pull the E pin high to send the instruction
-	if (gpio_value(disp->E, 1))
-		return 1;
-	usleep(t);
-
-	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+	return LCD_clock(disp, t); // Clock the LCD to write the data
 }
 
 /* Initialize the LCD */
