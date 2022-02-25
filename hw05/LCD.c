@@ -146,7 +146,7 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
 
 	// Normal instruction writing
 	// Write the first half
-	if (LCD_pin_set(disp, data, t))
+	if (LCD_pin_set(disp, data, 1))
 		return 1;
 
 	// Write the second half
