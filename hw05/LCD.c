@@ -130,7 +130,19 @@ int LCD_deinit(const struct LCD *disp)
 
 
 /* Write data to the LCD */
-int LCD_data_write(const struct LCD *disp);
+int LCD_data_write(const struct LCD *disp, char letter)
+{
+	if (letter < 0x20)
+		return 2;
+
+	// Write the first half at the cursor location
+	if (LCD_pin_set(disp, 0x10 | ((letter & 0xF0) >> 4), 0))
+		return -1;
+
+	// Write the second half at the cursor location
+	return LCD_pin_set(disp, 0x10 | (letter & 0xF), 40);
+
+}
 
 /* Write an instruction to the LCD */
 int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
