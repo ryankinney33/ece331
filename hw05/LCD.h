@@ -43,6 +43,8 @@ struct LCD {
 /* Initialize the LCD */
 int LCD_init(const struct LCD *disp);
 
+int LCD_deinit(const struct LCD *disp);
+
 /* Write data to the LCD */
 int LCD_data_write(const struct LCD *disp);
 

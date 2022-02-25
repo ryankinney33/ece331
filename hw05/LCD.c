@@ -10,6 +10,7 @@ static int LCD_gpio_init(const struct LCD *disp)
 
 	// Export the required pins
 	r = gpio_export(disp->RS);
+	if (r) return 1;
 	r |= gpio_export(disp->E);
 	r |= gpio_export(disp->D4);
 	r |= gpio_export(disp->D5);
@@ -109,6 +110,21 @@ int LCD_init(const struct LCD *disp)
 	return 0; // Initialization done;
 }
 
+int LCD_deinit(const struct LCD *disp)
+{
+	int r;
+
+	// Export the required pins
+	r = gpio_unexport(disp->RS);
+	r |= gpio_unexport(disp->E);
+	r |= gpio_unexport(disp->D4);
+	r |= gpio_unexport(disp->D5);
+	r |= gpio_unexport(disp->D6);
+	r |= gpio_unexport(disp->D7);
+	return r;
+}
+
+
 /* Write data to the LCD */
 int LCD_data_write(const struct LCD *disp);
 
@@ -117,9 +133,9 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
 {
 	char data = (instr & 0xF0) >> 4; // Get the first part of instr
 
-	// Check for the FNCT_SET_INIT instructions, which act differently
-	if ((data == (LCD_FNCT_SET >> 4)) &&
-			((instr & 0x03) == LCD_FNCT_INIT)) {
+	// Check for the FNCT_SET init instructions, which act differently
+	if ((instr == (LCD_FNCT_SET | LCD_FNCT_SET_DL | LCD_FNCT_INIT)) ||
+			(instr == (LCD_FNCT_SET | LCD_FNCT_INIT))) {
 		// Write the instruction to the LCD
 		return LCD_pin_set(disp, data, t);
 	}
