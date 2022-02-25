@@ -1,13 +1,15 @@
 #ifndef LCD_H
 #define LCD_H
 
-/* Macros for the required GPIO pins */
-#define LCD_RS	17
-#define LCD_E	27
-#define DATA_D4	6
-#define DATA_D5 13
-#define DATA_D6 19
-#define DATA_D7 26
+// Structure to hold pin information for the LCD display
+struct LCD {
+	char RS;
+	char E;
+	char D4;
+	char D5;
+	char D6;
+	char D7;
+};
 
 /*
  * Macros for the display instructions. Please see
@@ -39,13 +41,13 @@
 #define LCD_SET_DD_ADDR 0x80	// Default address is 0x00
 
 /* Initialize the LCD */
-int LCD_init();
+int LCD_init(const struct LCD *disp);
 
 /* Write data to the LCD */
-int LCD_data_write();
+int LCD_data_write(const struct LCD *disp);
 
 /* Write an instruction to the LCD */
-int LCD_instruction_write(char instruction);
+int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t);
 
 /* Write a character to a specific location on the display */
 int LCD_character_write();

@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "gpio_q4.h"
+#include "gpio.h"
 
 /* Exports the passed GPIO pin */
 int gpio_export(int pin)
