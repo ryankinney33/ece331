@@ -102,8 +102,12 @@ int LCD_init(const struct LCD *disp)
 		return 1;
 
 	// Set the entry mode to increment without display shift
+	if (LCD_instruction_write(disp, LCD_ENTRY_MODE | LCD_ENTRY_MODE_ID, 40))
+		return 1;
+
+	// Turn on the display, cursor, and blinking
 	if (LCD_instruction_write(disp, LCD_ON_OFF_CTRL | LCD_ON_OFF_CTRL_D |
-			LCD_ON_OFF_CTRL_C | LCD_ON_OFF_CTRL_B, 41)) {
+			LCD_ON_OFF_CTRL_C | LCD_ON_OFF_CTRL_B, 40)) {
 		return 1;
 	}
 
@@ -142,11 +146,11 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
 
 	// Normal instruction writing
 	// Write the first half
-	if (LCD_pin_set(disp, data, 2))
+	if (LCD_pin_set(disp, data, t))
 		return 1;
 
 	// Write the second half
-	return LCD_pin_set(disp, data, t);
+	return LCD_pin_set(disp, instr & 0x0F, t);
 }
 
 /* Write a character to a specific location on the display */
