@@ -50,6 +50,7 @@ greybox_tmp/
 *.hex
 *.bin
 *.map
+main
 
 # Debug files
 *.dSYM/
