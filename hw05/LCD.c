@@ -37,7 +37,7 @@ static int LCD_gpio_init(const struct LCD *disp)
  * The bits of val represent RS,D7,D6,D5,D4
  * t is the delay to wait after writing the instruction
  */
-static int LCD_pin_set(const struct LCD *disp, char val, unsigned int t)
+static int LCD_write(const struct LCD *disp, char val, unsigned int t)
 {
 	int r;
 
@@ -58,7 +58,7 @@ static int LCD_pin_set(const struct LCD *disp, char val, unsigned int t)
 	return gpio_value(disp->E, 0); // Pull E low for the next instruction
 }
 
-/* Initialize the LCD */
+/* Initialize the LCD connected to the pins listed in disp */
 int LCD_init(const struct LCD *disp)
 {
 	// The required GPIO pins need to be configured
@@ -106,14 +106,11 @@ int LCD_init(const struct LCD *disp)
 		return 1;
 
 	// Turn on the display, cursor, and blinking
-	if (LCD_instruction_write(disp, LCD_ON_OFF_CTRL | LCD_ON_OFF_CTRL_D |
-			LCD_ON_OFF_CTRL_C | LCD_ON_OFF_CTRL_B, 40)) {
-		return 1;
-	}
-
-	return 0; // Initialization done;
+	return LCD_instruction_write(disp, LCD_ON_OFF_CTRL | LCD_ON_OFF_CTRL_D |
+			LCD_ON_OFF_CTRL_C | LCD_ON_OFF_CTRL_B, 40);
 }
 
+/* Unexport all the gpio pins associated with disp */
 int LCD_deinit(const struct LCD *disp)
 {
 	int r;
@@ -129,18 +126,18 @@ int LCD_deinit(const struct LCD *disp)
 }
 
 
-/* Write data to the LCD */
+/* Write data to the LCD at the current DD ram address */
 int LCD_data_write(const struct LCD *disp, char letter)
 {
 	if (letter < 0x20)
 		return 2;
 
 	// Write the first half at the cursor location
-	if (LCD_pin_set(disp, 0x10 | ((letter & 0xF0) >> 4), 0))
+	if (LCD_write(disp, 0x10 | ((letter & 0xF0) >> 4), 0))
 		return -1;
 
 	// Write the second half at the cursor location
-	return LCD_pin_set(disp, 0x10 | (letter & 0xF), 40);
+	return LCD_write(disp, 0x10 | (letter & 0xF), 40);
 
 }
 
@@ -153,17 +150,37 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
 	if ((instr == (LCD_FNCT_SET | LCD_FNCT_SET_DL | LCD_FNCT_INIT)) ||
 			(instr == (LCD_FNCT_SET | LCD_FNCT_INIT))) {
 		// Write the instruction to the LCD
-		return LCD_pin_set(disp, data, t);
+		return LCD_write(disp, data, t);
 	}
 
 	// Normal instruction writing
 	// Write the first half
-	if (LCD_pin_set(disp, data, 1))
+	if (LCD_write(disp, data, 1))
 		return 1;
 
 	// Write the second half
-	return LCD_pin_set(disp, instr & 0x0F, t);
+	return LCD_write(disp, instr & 0x0F, t);
 }
 
-/* Write a character to a specific location on the display */
-int LCD_character_write();
+/*
+ * Writes character a to the location specified by row and col to the
+ * display specified by disp. Row must be 0 or 1 and col must be from 0-15.
+ */
+int LCD_character_write(const struct LCD *disp, char a, char row, char col)
+{
+	char addr;
+
+	// Make sure the character and location are valid
+	if (a < 0x20 || (row != 0 && row != 1) || (col < 0 || col > 15))
+		return 1;
+
+	// Combine the locations into the address
+	addr = (row << 6) | col;
+
+	// Set the DD ram address to the location pointed to by row and col
+	if (LCD_instruction_write(disp, LCD_SET_DD_ADDR | addr, 40))
+		return 1;
+
+	return LCD_data_write(disp, a); // Finally, write requested character
+}
+
