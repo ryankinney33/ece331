@@ -6,31 +6,34 @@
 /* Exports and sets the required GPIO pins as outputs */
 static int LCD_gpio_init(const struct LCD *disp)
 {
-	int r;
-
-	// Export the required pins
-	r = gpio_export(disp->RS);
-	if (r) return 1;
-	r |= gpio_export(disp->E);
-	r |= gpio_export(disp->D4);
-	r |= gpio_export(disp->D5);
-	r |= gpio_export(disp->D6);
-	r |= gpio_export(disp->D7);
-	if (r) // Error Checking
+	// Export the required pins and perform error checking
+	if (gpio_export(dist-RS) ||
+			gpio_export(disp->E) || gpio_export(disp->D4) ||
+			gpio_export(disp->D5) || gpio_export(disp->D6) ||
+			gpio_export(disp->D7)) {
 		return 1;
+	}
 
-	// Set the pins as output
-	r = gpio_direction(disp->RS, "out");
-	r |= gpio_direction(disp->E, "out");
-	r |= gpio_direction(disp->D4, "out");
-	r |= gpio_direction(disp->D5, "out");
-	r |= gpio_direction(disp->D6, "out");
-	r |= gpio_direction(disp->D7, "out");
-	if (r) // Error Checking
-		return 1;
-
-	return 0; // No problems encountered.
+	// Set the pins as output with error checking
+	return (gpio_direction(disp->RS, "out") ||
+			gpio_direction(disp->E, "out") ||
+			gpio_direction(disp->D4, "out") ||
+			gpio_direction(disp->D5, "out") ||
+			gpio_direction(disp->D6, "out") ||
+			gpio_direction(disp->D7, "out"));
 }
+
+/* Clocks the LCD display to write the data */
+static int LCD_clock(const struct LCD *disp, unsigned int t)
+{
+	// Pull the E pin high to send the instruction
+	if (gpio_value(disp->E, 1))
+		return 1;
+	usleep(t); // Wait the required time for the instruction execution
+
+	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+}
+
 
 /*
  * Sets the RS and data GPIO then sets the E pin to write to the display.
@@ -39,23 +42,17 @@ static int LCD_gpio_init(const struct LCD *disp)
  */
 static int LCD_write(const struct LCD *disp, char val, unsigned int t)
 {
-	int r;
-
-	// Decode val and set pins accordingly
-	r = gpio_value(disp->RS, (val >> 4) & 1);
-	r |= gpio_value(disp->D7, (val >> 3) & 1);
-	r |= gpio_value(disp->D6, (val >> 2) & 1);
-	r |= gpio_value(disp->D5, (val >> 1) & 1);
-	r |= gpio_value(disp->D4, val & 1);
-	if (r)
-		return 1; // Error checking
-
-	// Pull the E pin high to send the instruction
-	if (gpio_value(disp->E, 1))
+	// Decode val and set pins accordingly with error checking
+	if (gpio_value(disp->RS, (val >> 4) & 1) ||
+			gpio_value(disp->D7, (val >> 3) & 1) ||
+			gpio_value(disp->D6, (val >> 2) & 1) ||
+			gpio_value(disp->D5, (val >> 1) & 1) ||
+			gpio_value(disp->D4, val & 1)) {
 		return 1;
-	usleep(t);
+	}
 
-	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+	// Clock the LCD and return the error status
+	return LCD_clock(disp, t);
 }
 
 /* Initialize the LCD connected to the pins listed in disp */
