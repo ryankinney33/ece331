@@ -6,6 +6,9 @@
 
 int main()
 {
+	char *buffer = "ECE 331";
+	int i;
+
 	// Assign the used LCD pins for the display
 	struct LCD disp = {
 		.RS = 17,
@@ -21,6 +24,15 @@ int main()
 		perror("Error initializing LCD");
 		LCD_deinit(&disp);
 		return 1;
+	}
+
+	// Write the buffer to the display on row 0
+	for (i = 0; buffer[i]; ++i) {
+		if (LCD_character_write(&disp, buffer[i], 0, i)) {
+			perror("Writing data to the display:");
+			LCD_deinit(&disp);
+			return 1;
+		}
 	}
 
 	return LCD_deinit(&disp);
