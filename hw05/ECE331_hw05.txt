@@ -1,2 +1,437 @@
 1.
-	The LCD has been wired.
+	The LCD was wired incorrectly, then fixed after 2 hours of debugging the LCD
+	code. The LCD is now wired.
+2.
+# FILE: Makefile
+# Usage
+# make		Compile all binaries
+# make clean	Remove all binaries and object files
+TARGET = main
+OBJS = main.o LCD.o gpio.o
+CC = gcc
+CFLAGS = -g -Wall
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) -o $(TARGET)
+
+clean:
+	rm -f $(TARGET) $(OBJS) core*
+
+
+/* FILE: gpio.h */
+#ifndef GPIO_H
+#define GPIO_H
+
+/* Exports the passed GPIO pin */
+int gpio_export(int pin);
+
+/* Unexports the passed GPIO pin */
+int gpio_unexport(int pin);
+
+/* Sets the passed pin to either high or low */
+int gpio_value(int pin, int value);
+
+/* Sets the passed pin as input or output */
+int gpio_direction(int pin, char *direction);
+
+#endif /* GPIO_H */
+
+
+/* FILE: gpio.c */
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#include "gpio.h"
+
+/* Exports the passed GPIO pin */
+int gpio_export(int pin)
+{
+	/* Open the file to export the GPIO pin */
+	int fd = open("/sys/class/gpio/export", O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	}
+
+	/* Write the pin number to export it and perform error checking */
+	if (dprintf(fd, "%d", pin) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* Unexports the passed GPIO pin */
+int gpio_unexport(int pin)
+{
+	/* Open the file to unexport the GPIO pin */
+	int fd = open("/sys/class/gpio/unexport", O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	}
+
+	/* Write the pin number to unexport it and perform error checking */
+	if (dprintf(fd, "%d", pin) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* Sets the passed pin to either high or low */
+int gpio_value(int pin, int value)
+{
+	char path[50]; /* Holds the path of the file to be opened */
+	int fd;
+
+	if (value != 0 && value != 1)
+		return 1; /* Sanity check */
+
+	/* Generate the path depending on the passed pin number */
+	snprintf(path, 50, "/sys/class/gpio/gpio%d/value", pin);
+
+	/* Open the file and attempt to write the value */
+	fd = open(path, O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	} else if (dprintf(fd, "%d", value) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+/* Sets the passed pin as input or output */
+int gpio_direction(int pin, char *direction)
+{
+	char path[50]; /* Holds the path of the file to be opened */
+	int fd;
+
+	/* Perform some error checking */
+	if (direction == NULL || (strcmp(direction, "out") != 0
+				&& strcmp(direction, "in") != 0)) {
+		return 1;
+	}
+
+	/* Generate the path depending on the passed pin number */
+	snprintf(path, 50, "/sys/class/gpio/gpio%d/direction", pin);
+
+	/* Open the file and attempt to write the direction */
+	fd = open(path, O_WRONLY);
+	if (fd < 0) { /* error checking */
+		return 1;
+	}
+	if (dprintf(fd, "%s", direction) < 0) {
+		close(fd);
+		return 1;
+	}
+
+	close(fd);
+	return 0;
+}
+
+
+/* FILE: LCD.h */
+#ifndef LCD_H
+#define LCD_H
+
+// Structure to hold pin information for the LCD display
+struct LCD {
+	char RS;
+	char E;
+	char D4;
+	char D5;
+	char D6;
+	char D7;
+};
+
+/*
+ * Macros for the display instructions. Please see
+ * the Optrex Character LCD Manual for more information.
+ */
+#define LCD_CLR_DISP	0x01 // Clears entire display
+#define LCD_RET_HOME	0x02 // Returns shifted display to origin
+
+#define LCD_ENTRY_MODE	  0x04 // Defaults to decrement and no shift
+#define LCD_ENTRY_MODE_ID 0x02 // Sets direction to increment
+#define LCD_ENTRY_MODE_S  0x01 // Enables display shift
+
+#define LCD_ON_OFF_CTRL   0x08 // Base on/off instruction; Display OFF
+#define LCD_ON_OFF_CTRL_D 0x04 // Entire Display ON
+#define LCD_ON_OFF_CTRL_C 0x02 // Cursor ON
+#define LCD_ON_OFF_CTRL_B 0x01 // Blink ON
+
+#define LCD_CRSR_DISP_SHFT      0x10 // Defaults to cursor move left
+#define LCD_CRSR_DISP_SHFT_SC	0x08 // Set display shift
+#define LCD_CRSR_DISP_SHFT_RL	0x04 // Set direction to right
+
+#define LCD_FNCT_SET	0x20	// Default to 4 bit, 1 line, 5x7 dots
+#define LCD_FNCT_SET_DL	0x10	// Set to 8 bit mode
+#define LCD_FNCT_SET_N	0x08	// Set to 2 line mode
+#define LCD_FNCT_SET_F	0x04	// Set to 5x10 dot mode
+#define LCD_FNCT_INIT	0x03	// Specifies the instruction is for setup
+
+#define LCD_SET_CG_ADDR	0x40	// Default address is 0x00
+#define LCD_SET_DD_ADDR 0x80	// Default address is 0x00
+
+/* Initialize the LCD */
+int LCD_init(const struct LCD *disp);
+
+int LCD_deinit(const struct LCD *disp);
+
+/* Write data to the LCD */
+int LCD_data_write(const struct LCD *disp, char letter);
+
+/* Write an instruction to the LCD */
+int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t);
+
+/* Write a character to a specific location on the display */
+int LCD_character_write(const struct LCD *disp, char a, char row, char col);
+
+#endif /* LCD_H */
+
+
+/* FILE: LCD.c */
+#include <unistd.h>
+
+#include "gpio.h"
+#include "LCD.h"
+
+/* Exports and sets the required GPIO pins as outputs */
+static int LCD_gpio_init(const struct LCD *disp)
+{
+	// Export the required pins and perform error checking
+	if (gpio_export(disp->RS) ||
+			gpio_export(disp->E) || gpio_export(disp->D4) ||
+			gpio_export(disp->D5) || gpio_export(disp->D6) ||
+			gpio_export(disp->D7)) {
+		return 1;
+	}
+
+	// Set the pins as output with error checking
+	return (gpio_direction(disp->RS, "out") ||
+			gpio_direction(disp->E, "out") ||
+			gpio_direction(disp->D4, "out") ||
+			gpio_direction(disp->D5, "out") ||
+			gpio_direction(disp->D6, "out") ||
+			gpio_direction(disp->D7, "out"));
+}
+
+/* Clocks the LCD display to write the data */
+static int LCD_clock(const struct LCD *disp, unsigned int t)
+{
+	// Pull the E pin high to send the instruction
+	if (gpio_value(disp->E, 1))
+		return 1;
+	usleep(t); // Wait the required time for the instruction execution
+
+	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+}
+
+
+/*
+ * Sets the RS and data GPIO then sets the E pin to write to the display.
+ * The bits of val represent RS,D7,D6,D5,D4
+ * t is the delay to wait after writing the instruction
+ */
+static int LCD_write(const struct LCD *disp, char val, unsigned int t)
+{
+	// Decode val and set pins accordingly with error checking
+	if (gpio_value(disp->RS, (val >> 4) & 1) ||
+			gpio_value(disp->D7, (val >> 3) & 1) ||
+			gpio_value(disp->D6, (val >> 2) & 1) ||
+			gpio_value(disp->D5, (val >> 1) & 1) ||
+			gpio_value(disp->D4, val & 1)) {
+		return 1;
+	}
+
+	// Clock the LCD and return the error status
+	return LCD_clock(disp, t);
+}
+
+/* Initialize the LCD connected to the pins listed in disp */
+int LCD_init(const struct LCD *disp)
+{
+	// The required GPIO pins need to be configured
+	if (LCD_gpio_init(disp))
+		return 1;
+	usleep(15010); // Delay for more than 15 ms after Vcc = 4.5V
+
+	// Send Function Set 8 command
+	if (LCD_instruction_write(disp, LCD_FNCT_SET |
+			LCD_FNCT_SET_DL | LCD_FNCT_INIT, 4100)) {
+		return 1;
+	}
+
+	// Send another Function Set 8 command
+	if (LCD_instruction_write(disp, LCD_FNCT_SET |
+			LCD_FNCT_SET_DL | LCD_FNCT_INIT, 100)) {
+		return 1;
+	}
+
+	// Send the final Function Set 8 command
+	if (LCD_instruction_write(disp, LCD_FNCT_SET |
+			LCD_FNCT_SET_DL | LCD_FNCT_INIT, 40)) {
+		return 1;
+	}
+
+	// Send a Function Set 4 command
+	if (LCD_instruction_write(disp, LCD_FNCT_SET | LCD_FNCT_INIT, 40))
+		return 1;
+
+	// Configure the display; 2 lines, 5x7 font
+	if (LCD_instruction_write(disp, LCD_FNCT_SET | LCD_FNCT_SET_N, 40))
+		return 1;
+
+	// Turn the display off
+	if (LCD_instruction_write(disp, LCD_ON_OFF_CTRL, 40))
+		return 1;
+
+	// Clear the display
+	if (LCD_instruction_write(disp, LCD_CLR_DISP, 15200))
+		return 1;
+
+	// Set the entry mode to increment without display shift
+	if (LCD_instruction_write(disp, LCD_ENTRY_MODE | LCD_ENTRY_MODE_ID, 40))
+		return 1;
+
+	// Turn on the display, cursor, and blinking
+	return LCD_instruction_write(disp, LCD_ON_OFF_CTRL | LCD_ON_OFF_CTRL_D |
+			LCD_ON_OFF_CTRL_C | LCD_ON_OFF_CTRL_B, 40);
+}
+
+/* Unexport all the gpio pins associated with disp */
+int LCD_deinit(const struct LCD *disp)
+{
+	int r;
+
+	// Export the required pins
+	r = gpio_unexport(disp->RS);
+	r |= gpio_unexport(disp->E);
+	r |= gpio_unexport(disp->D4);
+	r |= gpio_unexport(disp->D5);
+	r |= gpio_unexport(disp->D6);
+	r |= gpio_unexport(disp->D7);
+	return r;
+}
+
+
+/* Write data to the LCD at the current DD ram address */
+int LCD_data_write(const struct LCD *disp, char letter)
+{
+	if (letter < 0x20)
+		return 2;
+
+	// Write the first half at the cursor location
+	if (LCD_write(disp, 0x10 | ((letter & 0xF0) >> 4), 0))
+		return -1;
+
+	// Write the second half at the cursor location
+	return LCD_write(disp, 0x10 | (letter & 0xF), 40);
+
+}
+
+/* Write an instruction to the LCD */
+int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
+{
+	char data = (instr & 0xF0) >> 4; // Get the first part of instr
+
+	// Check for the FNCT_SET init instructions, which act differently
+	if ((instr == (LCD_FNCT_SET | LCD_FNCT_SET_DL | LCD_FNCT_INIT)) ||
+			(instr == (LCD_FNCT_SET | LCD_FNCT_INIT))) {
+		// Write the instruction to the LCD
+		return LCD_write(disp, data, t);
+	}
+
+	// Normal instruction writing
+	// Write the first half
+	if (LCD_write(disp, data, 1))
+		return 1;
+
+	// Write the second half
+	return LCD_write(disp, instr & 0x0F, t);
+}
+
+/*
+ * Writes character a to the location specified by row and col to the
+ * display specified by disp. Row must be 0 or 1 and col must be from 0-15.
+ */
+int LCD_character_write(const struct LCD *disp, char a, char row, char col)
+{
+	char addr;
+
+	// Make sure the character and location are valid
+	if (a < 0x20 || (row != 0 && row != 1) || (col < 0 || col > 15))
+		return 1;
+
+	// Combine the locations into the address
+	addr = (row << 6) | col;
+
+	// Set the DD ram address to the location pointed to by row and col
+	if (LCD_instruction_write(disp, LCD_SET_DD_ADDR | addr, 40))
+		return 1;
+
+	return LCD_data_write(disp, a); // Finally, write requested character
+}
+
+
+/* FILE: main.c */
+#include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
+
+#include "LCD.h"
+
+int main()
+{
+	char *buffer = "ECE 331";
+	int i;
+
+	// Assign the used LCD pins for the display
+	struct LCD disp = {
+		.RS = 17,
+		.E = 27,
+		.D4 = 6,
+		.D5 = 13,
+		.D6 = 19,
+		.D7 = 26
+	};
+
+	// Initialize the LCD
+	if (LCD_init(&disp)) {
+		perror("Error initializing LCD");
+		LCD_deinit(&disp);
+		return 1;
+	}
+
+	// Write the buffer to the display on row 0
+	for (i = 0; buffer[i]; ++i) {
+		if (LCD_character_write(&disp, buffer[i], 0, i)) {
+			perror("Writing data to the display:");
+			LCD_deinit(&disp);
+			return 1;
+		}
+	}
+
+	return LCD_deinit(&disp);
+}
+
+
+3.
+	
+4.
+
+5.
+	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
