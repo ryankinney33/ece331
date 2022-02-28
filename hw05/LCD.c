@@ -59,9 +59,8 @@ static int LCD_write(const struct LCD *disp, char val, unsigned int t)
 int LCD_init(const struct LCD *disp)
 {
 	// The required GPIO pins need to be configured
-	if (LCD_gpio_init(disp)) {
+	if (LCD_gpio_init(disp))
 		return 1;
-	}
 	usleep(15010); // Delay for more than 15 ms after Vcc = 4.5V
 
 	// Send Function Set 8 command
