@@ -7,7 +7,7 @@
 static int LCD_gpio_init(const struct LCD *disp)
 {
 	// Export the required pins and perform error checking
-	if (gpio_export(dist-RS) ||
+	if (gpio_export(disp->RS) ||
 			gpio_export(disp->E) || gpio_export(disp->D4) ||
 			gpio_export(disp->D5) || gpio_export(disp->D6) ||
 			gpio_export(disp->D7)) {
