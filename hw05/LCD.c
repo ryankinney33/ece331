@@ -29,9 +29,7 @@ static int LCD_clock(const struct LCD *disp, unsigned int t)
 	// Pull the E pin high to send the instruction
 	if (gpio_value(disp->E, 1))
 		return 1;
-
 	usleep(5);
-
 	if (gpio_value(disp->E, 0)) // Pull E low for the next instruction
 		return 1;
 
