@@ -432,8 +432,21 @@ int main()
 3.
 	
 4a.
-	The regex should match ALL of the following (and more)
+	The regex should match ALL of the following examples (and more)
 		1.
+		1.0
+		1.0f
+		1.0F
+		1.0l
+		1.0L
+		.0
+		-1.
+		+5.7
+		1e5
+		-1e-5
+		-1e+5
+		.4e+5
+		.6
 		0.1L
 		120359.435634693f
 		+1111e5
@@ -446,8 +459,8 @@ int main()
 4b.
 	The minimum match is a single digit and a .
 	For example:
-		1.
-		.1
+		6.
+		.9
 4c.
 	/[+-]?((((\d*\.\d+)|(\d+\.))([eE][+-]?\d+)?)|(\d+[eE][+-]?\d+))[fFlL]?/
 
