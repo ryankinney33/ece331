@@ -43,6 +43,7 @@ struct LCD {
 /* Initialize the LCD */
 int LCD_init(const struct LCD *disp);
 
+/* Unexport the pins for the LCD */
 int LCD_deinit(const struct LCD *disp);
 
 /* Write data to the LCD */
