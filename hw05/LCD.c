@@ -128,17 +128,17 @@ int LCD_deinit(const struct LCD *disp)
 
 
 /* Write data to the LCD at the current DD ram address */
-int LCD_data_write(const struct LCD *disp, char letter)
+int LCD_data_write(const struct LCD *disp, unsigned char a)
 {
-	if (letter < 0x20)
+	if (a < 0x20)
 		return 2;
 
 	// Write the first half at the cursor location
-	if (LCD_write(disp, 0x10 | ((letter & 0xF0) >> 4), 10))
+	if (LCD_write(disp, 0x10 | ((a & 0xF0) >> 4), 10))
 		return -1;
 
 	// Write the second half at the cursor location
-	return LCD_write(disp, 0x10 | (letter & 0xF), 100);
+	return LCD_write(disp, 0x10 | (a & 0xF), 40);
 
 }
 
@@ -167,13 +167,15 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
  * Writes character a to the location specified by row and col to the
  * display specified by disp. Row must be 0 or 1 and col must be from 0-15.
  */
-int LCD_character_write(const struct LCD *disp, char a, char row, char col)
+int LCD_character_write(const struct LCD *disp, unsigned char a, char row, char col)
 {
 	char addr;
 
 	// Make sure the character and location are valid
-	if (a < 0x20 || (row != 0 && row != 1) || (col < 0 || col > 15))
-		return 1;
+	// Assumes the LCD is at most 2 rows, 40 columns
+	// Characters less than 0x20 map to CG ram on the display; ignore them
+	if (a < 0x20 || (row != 0 && row != 1) || (col < 0 || col > 39))
+		return 2; // Invalid character/location
 
 	// Combine the locations into the address
 	addr = (row << 6) | col;

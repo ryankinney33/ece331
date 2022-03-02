@@ -46,12 +46,12 @@ int LCD_init(const struct LCD *disp);
 int LCD_deinit(const struct LCD *disp);
 
 /* Write data to the LCD */
-int LCD_data_write(const struct LCD *disp, char letter);
+int LCD_data_write(const struct LCD *disp, unsigned char a);
 
 /* Write an instruction to the LCD */
 int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t);
 
 /* Write a character to a specific location on the display */
-int LCD_character_write(const struct LCD *disp, char a, char row, char col);
+int LCD_character_write(const struct LCD *disp, unsigned char a, char row, char col);
 
 #endif /* LCD_H */
