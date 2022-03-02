@@ -1,6 +1,5 @@
 1.
-	The LCD was wired incorrectly, then fixed after 2 hours of debugging the LCD
-	code. The LCD is now wired.
+	The LCD was wired.
 2.
 # FILE: Makefile
 # Usage
@@ -189,6 +188,7 @@ struct LCD {
 /* Initialize the LCD */
 int LCD_init(const struct LCD *disp);
 
+/* Unexport all the gpio pins associated with disp */
 int LCD_deinit(const struct LCD *disp);
 
 /* Write data to the LCD */
@@ -431,7 +431,25 @@ int main()
 
 3.
 	
-4.
+4a.
+	The regex should match ALL of the following (and more)
+		1.
+		0.1L
+		120359.435634693f
+		+1111e5
+		-56.7e+9
+		.528F
+		.1e4
+		.8
+		-123e-41
+		-962e05
+4b.
+	The minimum match is a single digit and a .
+	For example:
+		1.
+		.1
+4c.
+	/[+-]?((((\d*\.\d+)|(\d+\.))([eE][+-]?\d+)?)|(\d+[eE][+-]?\d+))[fFlL]?/
 
 5.
 	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
