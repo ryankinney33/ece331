@@ -29,9 +29,14 @@ static int LCD_clock(const struct LCD *disp, unsigned int t)
 	// Pull the E pin high to send the instruction
 	if (gpio_value(disp->E, 1))
 		return 1;
-	usleep(t); // Wait the required time for the instruction execution
 
-	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+	usleep(5);
+
+	if (gpio_value(disp->E, 0)) // Pull E low for the next instruction
+		return 1;
+
+	usleep(t); // Wait the required time for the instruction execution
+	return 0;
 }
 
 
@@ -129,11 +134,11 @@ int LCD_data_write(const struct LCD *disp, char letter)
 		return 2;
 
 	// Write the first half at the cursor location
-	if (LCD_write(disp, 0x10 | ((letter & 0xF0) >> 4), 0))
+	if (LCD_write(disp, 0x10 | ((letter & 0xF0) >> 4), 10))
 		return -1;
 
 	// Write the second half at the cursor location
-	return LCD_write(disp, 0x10 | (letter & 0xF), 40);
+	return LCD_write(disp, 0x10 | (letter & 0xF), 100);
 
 }
 
@@ -151,7 +156,7 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
 
 	// Normal instruction writing
 	// Write the first half
-	if (LCD_write(disp, data, 1))
+	if (LCD_write(disp, data, 10))
 		return 1;
 
 	// Write the second half
