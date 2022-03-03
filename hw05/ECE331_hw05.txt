@@ -438,7 +438,21 @@ int main()
 
 
 3.
-	
+	The code was downloaded from https://gitlab.eece.maine.edu/ECE331-Student/ece331-s22-lcd
+	and compiled using the provided Makefile. The module was loaded with
+		sudo insmod lcd.ko
+	The output of 'lsmod | head' is:
+		Module                  Size  Used by
+		lcd                    16384  0
+		rfcomm                 49152  4
+		cmac                   16384  2
+		algif_hash             16384  1
+		aes_arm_bs             24576  2
+		crypto_simd            16384  1 aes_arm_bs
+		cryptd                 24576  2 crypto_simd
+		algif_skcipher         16384  1
+		af_alg                 28672  6 algif_hash,algif_skcipher
+
 4a.
 	The regex should match ALL of the following examples (and more)
 		1.
@@ -465,7 +479,7 @@ int main()
 		-123e-41
 		-962e05
 4b.
-	The minimum match is a single digit and a .
+	The minimum match is a single digit and decimal point.
 	For example:
 		6.
 		.9
