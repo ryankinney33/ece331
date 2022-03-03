@@ -188,17 +188,17 @@ struct LCD {
 /* Initialize the LCD */
 int LCD_init(const struct LCD *disp);
 
-/* Unexport all the gpio pins associated with disp */
+/* Unexport the pins for the LCD */
 int LCD_deinit(const struct LCD *disp);
 
 /* Write data to the LCD */
-int LCD_data_write(const struct LCD *disp, char letter);
+int LCD_data_write(const struct LCD *disp, unsigned char a);
 
 /* Write an instruction to the LCD */
 int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t);
 
 /* Write a character to a specific location on the display */
-int LCD_character_write(const struct LCD *disp, char a, char row, char col);
+int LCD_character_write(const struct LCD *disp, unsigned char a, char row, char col);
 
 #endif /* LCD_H */
 
@@ -235,9 +235,14 @@ static int LCD_clock(const struct LCD *disp, unsigned int t)
 	// Pull the E pin high to send the instruction
 	if (gpio_value(disp->E, 1))
 		return 1;
-	usleep(t); // Wait the required time for the instruction execution
 
-	return gpio_value(disp->E, 0); // Pull E low for the next instruction
+	usleep(5);
+
+	if (gpio_value(disp->E, 0)) // Pull E low for the next instruction
+		return 1;
+
+	usleep(t); // Wait the required time for the instruction execution
+	return 0;
 }
 
 
@@ -329,17 +334,17 @@ int LCD_deinit(const struct LCD *disp)
 
 
 /* Write data to the LCD at the current DD ram address */
-int LCD_data_write(const struct LCD *disp, char letter)
+int LCD_data_write(const struct LCD *disp, unsigned char a)
 {
-	if (letter < 0x20)
+	if (a < 0x20)
 		return 2;
 
 	// Write the first half at the cursor location
-	if (LCD_write(disp, 0x10 | ((letter & 0xF0) >> 4), 0))
+	if (LCD_write(disp, 0x10 | ((a & 0xF0) >> 4), 10))
 		return -1;
 
 	// Write the second half at the cursor location
-	return LCD_write(disp, 0x10 | (letter & 0xF), 40);
+	return LCD_write(disp, 0x10 | (a & 0xF), 40);
 
 }
 
@@ -357,7 +362,7 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
 
 	// Normal instruction writing
 	// Write the first half
-	if (LCD_write(disp, data, 1))
+	if (LCD_write(disp, data, 10))
 		return 1;
 
 	// Write the second half
@@ -368,13 +373,15 @@ int LCD_instruction_write(const struct LCD *disp, char instr, unsigned int t)
  * Writes character a to the location specified by row and col to the
  * display specified by disp. Row must be 0 or 1 and col must be from 0-15.
  */
-int LCD_character_write(const struct LCD *disp, char a, char row, char col)
+int LCD_character_write(const struct LCD *disp, unsigned char a, char row, char col)
 {
 	char addr;
 
 	// Make sure the character and location are valid
-	if (a < 0x20 || (row != 0 && row != 1) || (col < 0 || col > 15))
-		return 1;
+	// Assumes the LCD is at most 2 rows, 40 columns
+	// Characters less than 0x20 map to CG ram on the display; ignore them
+	if (a < 0x20 || (row != 0 && row != 1) || (col < 0 || col > 39))
+		return 2; // Invalid character/location
 
 	// Combine the locations into the address
 	addr = (row << 6) | col;
@@ -396,7 +403,7 @@ int LCD_character_write(const struct LCD *disp, char a, char row, char col)
 
 int main()
 {
-	char *buffer = "ECE 331";
+	char *buffer = "ECE 331"; // The string to print on the display
 	int i;
 
 	// Assign the used LCD pins for the display
@@ -419,18 +426,33 @@ int main()
 	// Write the buffer to the display on row 0
 	for (i = 0; buffer[i]; ++i) {
 		if (LCD_character_write(&disp, buffer[i], 0, i)) {
-			perror("Writing data to the display:");
+			perror("Writing data to the display");
 			LCD_deinit(&disp);
 			return 1;
 		}
 	}
 
+	// Unexport the pins and exit
 	return LCD_deinit(&disp);
 }
 
 
 3.
-	
+	Code downloaded from https://gitlab.eece.maine.edu/ECE331-Student/ece331-s22-lcd
+	and compiled using the provided Makefile. The module was loaded with
+		sudo insmod lcd.ko
+	The output of 'lsmod | head' is:
+		Module                  Size  Used by
+		lcd                    16384  0
+		rfcomm                 49152  4
+		cmac                   16384  2
+		algif_hash             16384  1
+		aes_arm_bs             24576  2
+		crypto_simd            16384  1 aes_arm_bs
+		cryptd                 24576  2 crypto_simd
+		algif_skcipher         16384  1
+		af_alg                 28672  6 algif_hash,algif_skcipher
+
 4a.
 	The regex should match ALL of the following examples (and more)
 		1.
@@ -457,7 +479,7 @@ int main()
 		-123e-41
 		-962e05
 4b.
-	The minimum match is a single digit and a .
+	The minimum match is a single digit and decimal point.
 	For example:
 		6.
 		.9
@@ -465,4 +487,4 @@ int main()
 	/[+-]?((((\d*\.\d+)|(\d+\.))([eE][+-]?\d+)?)|(\d+[eE][+-]?\d+))[fFlL]?/
 
 5.
-	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
+	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier12
