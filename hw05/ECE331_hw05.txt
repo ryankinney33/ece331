@@ -438,7 +438,7 @@ int main()
 
 
 3.
-	The code was downloaded from https://gitlab.eece.maine.edu/ECE331-Student/ece331-s22-lcd
+	Code downloaded from https://gitlab.eece.maine.edu/ECE331-Student/ece331-s22-lcd
 	and compiled using the provided Makefile. The module was loaded with
 		sudo insmod lcd.ko
 	The output of 'lsmod | head' is:
@@ -487,4 +487,4 @@ int main()
 	/[+-]?((((\d*\.\d+)|(\d+\.))([eE][+-]?\d+)?)|(\d+[eE][+-]?\d+))[fFlL]?/
 
 5.
-	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier10
+	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier12
