@@ -484,7 +484,7 @@ int main()
 		6.
 		.9
 4c.
-	/[+-]?((((\d*\.\d+)|(\d+\.))([eE][+-]?\d+)?)|(\d+[eE][+-]?\d+))[fFlL]?/
+	[+-]?((((\d*\.\d+)|(\d+\.))([eE][+-]?\d+)?)|(\d+[eE][+-]?\d+))[fFlL]?
 
 5.
 	enscript ECE331_hw05.txt -b '$n %E $C|$%|Ryan Kinney' -F Courier12
