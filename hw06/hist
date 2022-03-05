@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+my @lengths;
+
+# Open the file with error checking
+open(f, '<', '/usr/share/dict/words') or die $!;
+
+while (<f>) {
+	# Remove new line and get the length
+	chomp;
+	$len = length;
+
+	# Increment counter if it exists
+	if (exists($lengths[$len])) {
+		$lengths[$len]++;
+	} else {
+		$lengths[$len] = 1;
+	}
+}
+
+# print the lengths
+for my $i (1 .. $#lengths) {
+	if (exists($lengths[$i])) {
+		print "$i $lengths[$i]\n";
+	}
+}
+
