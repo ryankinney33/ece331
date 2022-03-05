@@ -66,7 +66,7 @@ int main ()
 			// The child process exited without killing the parent
 			fprintf(stderr, "I am invincible! (not really...)\n");
 		}
-		return 1; // the parent should be killed, this should not be executed
+		return 1; // this should not normally be executed
 	} else {
 		// child process; commit parricide
 		printf("Child: murdering parent!\n");
@@ -79,3 +79,4 @@ int main ()
 }
 
 4.
+    enscript ECE331_hw06.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier12 -F Courier12
