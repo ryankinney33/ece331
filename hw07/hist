@@ -9,7 +9,8 @@ if (len(sys.argv)<2):
 hist = {}
 try:
     with open(sys.argv[1], 'r') as f:
-        for word in f.read().split():
+        for word in f.read().split(): # Iterate over the words read from the file
+            # Increment the count corresponding to each word length
             hist[len(word)] = hist.get(len(word), 0) + 1
 except Exception as err:
     sys.exit(str(err))
