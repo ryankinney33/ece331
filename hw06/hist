@@ -19,9 +19,10 @@ while (<f>) {
 }
 
 # print the lengths
+print "Length\tNumber\n";
 for my $i (1 .. $#lengths) {
 	if (exists($lengths[$i])) {
-		print "$i $lengths[$i]\n";
+		print "$i\t$lengths[$i]\n";
 	}
 }
 
