@@ -10,7 +10,8 @@ if (len(sys.argv)<2):
 hist = {}
 try:
     with open(sys.argv[1], 'r') as f:
-        for word in f.read().split():
+        for word in f.read().split(): # Iterate over the words from the file
+            # Increment the count corresponding to each word length
             hist[len(word)] = hist.get(len(word), 0) + 1
 except Exception as err:
     sys.exit(str(err))
@@ -29,6 +30,84 @@ $(TARGET): $(OBJS)
 
 clean:
 	rm -f $(TARGET) $(OBJS) core*
+
 3.
+#include <stdio.h>
+#include <sys/types.h>
+#include <pwd.h>
+
+int main(int argc, char *argv[])
+{
+	struct passwd *usr;
+	if (argc < 2) {
+		// No username passed
+		fprintf(stderr, "Usage: %s username\n", argv[0]);
+		return 1;
+	}
+
+	usr = getpwnam(argv[1]);
+	if (usr == NULL) { // error checking
+		// either user not found or another error
+		fprintf(stderr, "Error from getpwnam\n");
+		return 1;
+	}
+
+	printf("GECOS: %s\nhome: %s\n", usr->pw_gecos, usr->pw_dir);
+	return 0;
+}
+
+4a.
+	The assumptions:
+	American style zip codes are 5 digit numbers with an optional "+4"
+	The optional "+4" is a hyphen followed by a 4 digit number. Also
+	zip codes are assumed to be located at word boundaries, such as
+	after a space or before the end of the line.
+	Minimum match: 04401
+	Unintended matches include subtraction mathematical statements, such as
+	12345-1111=11324, in which case the zip+4 and the 5 digit number after
+	the equal sign are matched.
+\b[0-9]{5}(-[0-9]{4})?\b
+
+4b.
+	The assumptions:
+	English sentences must start with a capital letter and end with a period,
+	exclamation point, or question mark. A sentence can consist of only one
+	word as long as the previous criteria are met. Subsequent words in the
+	sentence may start with capital letters, as those words are proper nouns.
+	Other punctuation that may be used in sentences between words include
+	commas, colons, and semicolons. There may also be single quotes, double quotes
+	or parenthesis attached to the beginning or the ends of the words. Hyphenated
+	words or words with apostrophes are considered as one word, but words may
+	only contain letters, so those cases are not matched. It is assumed that
+	the words in the sentence may be nonsensical or misspelled. Words may
+	not be all capital letters except for single letter words, such as I.
+	Consecutive punctuation is not allowed except for closing parenthesis or
+	and quotes before the closing punctuation. There can also be double or single quote
+	after the period, for example: She told me, "but you, I am afraid, are maidenless."
+	is a valid sentence.
+	Minimum match: A.
+	Unintended matches include grammatically incorrect sentences.
+^[(\'\"]?[A-Z][a-z]*[)\'\"]?([\[,;:]? [(\'\"]?([A-Z]|[A-Z]?[a-z]+)[)\'\"]?)*[.?!][\'\"]?$
+
+4c.
+	The assumptions:
+	There do not have to be characters within the parenthesis. If there is
+	only one set of parenthesis then that must be the innermost set.
+	If there are multiple innermost sets, like ((set1)(set2)), then both
+	innermost sets are matched separately. Not all parenthesis must be matched.
+	If there is an inbalance, then the innermost complete set is matched, for example
+	in '(((((opens))', the regular expression matches (opens).
+	Minimum match: ()
+\([^()]*\)
+
+5a.
+
+5b.
+	sudo chown -R pi /usr/src
+5c.
+
+5d.
+	grep -E '^[0-9]+$' [0-9][0-9]
+
 7.
-    enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier12 -F Courier12
+    enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier10 -F Courier10
