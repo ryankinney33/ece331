@@ -1,0 +1,34 @@
+1.
+#!/usr/bin/python3
+import sys
+import os
+
+if (len(sys.argv)<2):
+    print("Usage: ./hist filename")
+    quit()
+
+hist = {}
+try:
+    with open(sys.argv[1], 'r') as f:
+        for word in f.read().split():
+            hist[len(word)] = hist.get(len(word), 0) + 1
+except Exception as err:
+    sys.exit(str(err))
+
+2.
+TARGET = invasion
+OBJS = snowday.o firealarm.o covid.o
+CFLAGS = -g
+LDLIBS = -lm
+
+.PHONY: all clean
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LDLIBS)
+
+clean:
+	rm -f $(TARGET) $(OBJS) core*
+3.
+7.
+    enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier12 -F Courier12

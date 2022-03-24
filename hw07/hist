@@ -1,0 +1,16 @@
+#!/usr/bin/python3
+import sys
+import os
+
+if (len(sys.argv)<2):
+    print("Usage: ./hist filename")
+    quit()
+
+hist = {}
+try:
+    with open(sys.argv[1], 'r') as f:
+        for word in f.read().split():
+            hist[len(word)] = hist.get(len(word), 0) + 1
+except Exception as err:
+    sys.exit(str(err))
+
