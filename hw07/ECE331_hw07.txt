@@ -75,16 +75,16 @@ int main(int argc, char *argv[])
 	word as long as the previous criteria are met. Subsequent words in the
 	sentence may start with capital letters, as those words are proper nouns.
 	Other punctuation that may be used in sentences between words include
-	commas, colons, and semicolons. There may also be single quotes, double quotes
-	or parenthesis attached to the beginning or the ends of the words. Hyphenated
-	words or words with apostrophes are considered as one word, but words may
-	only contain letters, so those cases are not matched. It is assumed that
-	the words in the sentence may be nonsensical or misspelled. Words may
-	not be all capital letters except for single letter words, such as I.
-	Consecutive punctuation is not allowed except for closing parenthesis or
-	and quotes before the closing punctuation. There can also be double or single quote
-	after the period, for example: She told me, "but you, I am afraid, are maidenless."
-	is a valid sentence.
+	commas, colons, and semicolons. There may also be single quotes, double
+	quotes or parenthesis attached to the beginning or the ends of the words.
+	Hyphenated words or words with apostrophes are considered as one word,
+	but words may only contain letters, so those cases are not matched. It is
+	assumed that the words in the sentence may be nonsensical or misspelled.
+	Words may not be all capital letters except for single letter words, such
+	as I. Consecutive punctuation is not allowed except for closing
+	parenthesis or and quotes before the closing punctuation. There can also
+	be double or single quote after the period, for example:
+	She told me, "but you, I am afraid, are maidenless." is a valid sentence.
 	Minimum match: A.
 	Unintended matches include grammatically incorrect sentences.
 ^[(\'\"]?[A-Z][a-z]*[)\'\"]?([\[,;:]? [(\'\"]?([A-Z]|[A-Z]?[a-z]+)[)\'\"]?)*[.?!][\'\"]?$
@@ -95,19 +95,30 @@ int main(int argc, char *argv[])
 	only one set of parenthesis then that must be the innermost set.
 	If there are multiple innermost sets, like ((set1)(set2)), then both
 	innermost sets are matched separately. Not all parenthesis must be matched.
-	If there is an inbalance, then the innermost complete set is matched, for example
-	in '(((((opens))', the regular expression matches (opens).
+	If there is an inbalance, then the innermost complete set is matched,
+	for example in '(((((opens))', the regular expression matches (opens).
 	Minimum match: ()
 \([^()]*\)
 
 5a.
-
+	sudo chmod -R og=rX /lamb/nirvana/geda-pcb
 5b.
 	sudo chown -R pi /usr/src
 5c.
-
+	sudo ln -s /opt/discord-0.17/abc /usr/local/bin/discord
 5d.
 	grep -E '^[0-9]+$' [0-9][0-9]
 
+6.
+	I would send an e-mail to my supervisor/manager saying what happened
+	because it is important the higher-ups know what is going on. Also,
+	admitting this makes me looks less suspicious and guilty in the audit.
+	After all, even if I tried to hide the fact unlawfully accessed the
+	system, the supervisor would find out in the daily audit. I would then
+	personally ask my supervisor to see if they got my e-mail. If required,
+	I would further explain what I was doing, why I was doing it, and what
+	I found. After that, I would accept any and all punishments because I
+	should not have accessed the system in the manner I did in the first place.
+
 7.
-    enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier10 -F Courier10
+    enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
