@@ -1,5 +1,5 @@
 1.
-    lighttpd is setup. The following command were used:
+    lighttpd is set up. The following commands were used:
 	sudo apt update
 	sudo apt install lighttpd
 	sudo chown -R pi:www-data /var/www/
@@ -37,7 +37,21 @@
 5b.
     The tutorial has been completed
 5c.
-    
+    socket()
+	This function creates an endpoint for communications and allows the
+	programmer to specify the domain (such as IPv4 (AF_INET)) and the socket type,
+	such as TCP or UDP.
+    bind()
+	This function "binds" or pairs a hostname and port number to the socket.
+    listen()
+	This function listens on a TCP socket for an incoming connection. Allows
+	the programmer to choose the number of incoming connections to queue.
+    accept()
+	This function accepts (or establishes) an incoming connection from the
+	queue created by the listener (from the listen function).
+    connect()
+	This function initiates a connection to the hostname supplied by the passed
+	hostname-port pair.
 
 6.
-    enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
+    enscript ECE331_hw08.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
