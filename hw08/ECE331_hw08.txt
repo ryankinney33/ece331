@@ -1,8 +1,16 @@
 1.
-
+    lighttpd is setup. The following command were used:
+	sudo apt update
+	sudo apt install lighttpd
+	sudo chown -R pi:www-data /var/www/
 2.
+	sudo apt update
+	sudo apt install sqlite3
 
 3.
+	sudo apt install php8.0-fpm php8.0-cgi php8.0-sqlite3 php8.0-cli
+	sudo lighttpd-enable-mod fastcgi fastcgi-php-fpm
+	sudo service lighttpd force-reload
 
 4.
     Example 1:
@@ -23,7 +31,13 @@
   │  192.168.89.200 │ 192.168.89.(201-206) │      /29      │ 192.168.89.207  │
   └─────────────────┴──────────────────────┴───────────────┴─────────────────┘
 
-5.
+5a.
+    The Python TCP client and server tutorial I followed is from the following:
+	https://www.tutorialspoint.com/python3/python_networking.htm
+5b.
+    The tutorial has been completed
+5c.
+    
 
 6.
     enscript ECE331_hw07.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
