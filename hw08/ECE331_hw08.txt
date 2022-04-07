@@ -23,13 +23,13 @@
 	BA = 192.168.89.207 = 0xC0A859CF
 	IP = NA + 1 to BA - 1 ==> 192.168.89.201 to 192.168.89.206
 	NM = ~BA | NA = 0xFFFFFFF8 = /29
-  ┌─────────────────┬──────────────────────┬───────────────┬─────────────────┐
-  │  Network (DDN)  │       IP (DDN)       │ Netmask(CIDR) │ Broadcast (DDN) │
-  ├─────────────────┼──────────────────────┼───────────────┼─────────────────┤
-  │   10.34.160.0   │     10.34.178.39     │      /19      │  10.34.191.255  │
-  ├─────────────────┼──────────────────────┼───────────────┼─────────────────┤
-  │  192.168.89.200 │ 192.168.89.(201-206) │      /29      │ 192.168.89.207  │
-  └─────────────────┴──────────────────────┴───────────────┴─────────────────┘
+  ----------------------------------------------------------------------------
+  |  Network (DDN)  |       IP (DDN)       | Netmask(CIDR) | Broadcast (DDN) |
+  |-----------------|----------------------|---------------|-----------------|
+  |   10.34.160.0   |     10.34.178.39     |      /19      |  10.34.191.255  |
+  |-----------------|----------------------|---------------|-----------------|
+  |  192.168.89.200 | 192.168.89.(201-206) |      /29      | 192.168.89.207  |
+  ----------------------------------------------------------------------------
 
 5a.
     The Python TCP client and server tutorial I followed is from the following:
@@ -39,8 +39,8 @@
 5c.
     socket()
 	This function creates an endpoint for communications and allows the
-	programmer to specify the domain (such as IPv4 (AF_INET)) and the socket type,
-	such as TCP or UDP.
+	programmer to specify the domain (such as IPv4 (AF_INET)) and the
+	socket type, such as TCP or UDP.
     bind()
 	This function "binds" or pairs a hostname and port number to the socket.
     listen()
