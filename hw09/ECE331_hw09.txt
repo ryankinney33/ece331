@@ -1,0 +1,6 @@
+1.
+
+2.
+
+3.
+    enscript ECE331_hw09.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
