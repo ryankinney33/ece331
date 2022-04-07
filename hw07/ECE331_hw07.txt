@@ -83,10 +83,11 @@ int main(int argc, char *argv[])
 	Words may not be all capital letters except for single letter words, such
 	as I. Consecutive punctuation is not allowed except for closing
 	parenthesis or and quotes before the closing punctuation. There can also
-	be double or single quote after the period, for example:
-	She told me, "but you, I am afraid, are maidenless." is a valid sentence.
+	be double or single quote after the period. The following line is valid:
+	She told me, "but you, I am afraid, are maidenless."
 	Minimum match: A.
-	Unintended matches include grammatically incorrect sentences.
+	Unintended matches include grammatically and orthographically incorrect
+	sentences.
 ^[(\'\"]?[A-Z][a-z]*[)\'\"]?([\[,;:]? [(\'\"]?([A-Z]|[A-Z]?[a-z]+)[)\'\"]?)*[.?!][\'\"]?$
 
 4c.
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
 	only one set of parenthesis then that must be the innermost set.
 	If there are multiple innermost sets, like ((set1)(set2)), then both
 	innermost sets are matched separately. Not all parenthesis must be matched.
-	If there is an inbalance, then the innermost complete set is matched,
+	If there is an imbalance, then the innermost complete set is matched,
 	for example in '(((((opens))', the regular expression matches (opens).
 	Minimum match: ()
 \([^()]*\)
@@ -113,8 +114,8 @@ int main(int argc, char *argv[])
 	I would send an e-mail to my supervisor/manager saying what happened
 	because it is important the higher-ups know what is going on. Also,
 	admitting this makes me looks less suspicious and guilty in the audit.
-	After all, even if I tried to hide the fact unlawfully accessed the
-	system, the supervisor would find out in the daily audit. I would then
+	After all, even if I tried to hide the fact that I  unlawfully accessed
+	the system, the supervisor would find out in the daily audit. I would then
 	personally ask my supervisor to see if they got my e-mail. If required,
 	I would further explain what I was doing, why I was doing it, and what
 	I found. After that, I would accept any and all punishments because I
