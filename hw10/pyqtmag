@@ -46,17 +46,13 @@ class XMagQWidget(QWidget):
 		print("xmagqwidget update")
 		self.replace=tf
 
-	def screen(self):
-		return QApplication.primaryScreen()
-
-
 class pyqtmag:
 	def __init__(self):
 		self.app=QApplication(sys.argv)
 		self.w=XMagQWidget()
 		self.w.setGeometry(100,100,200,200)
 		self.w.setWindowTitle('PyQtMag')
-		self.screen=self.w.screen()
+		self.screen=self.app.primaryScreen()
 
 		self.layout=QGridLayout()
 		self.w.setLayout(self.layout)
