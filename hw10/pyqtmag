@@ -1,0 +1,116 @@
+#!/usr/bin/python3
+
+# Need to install python3-pyqt5.qtx11extras
+import sys
+from PyQt5.QtGui import  *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtX11Extras import *
+
+class XMagQLabel(QLabel):
+	def setLabel(self, label):
+		self.label=label
+
+	def setqimage(self, qimage):
+		self.qimage=qimage
+
+	def mouseMoveEvent(self, event):
+		# Check bounds
+		if event.x()>=self.qimage.width():
+			return
+		if event.y()>=self.qimage.height():
+			return
+		if event.x()<0:
+			return
+		if event.y()<0:
+			return
+		c=self.qimage.pixelColor(event.pos())
+		t="Color [{x:3d},{y:3d}] ({r:2X},{g:2X},{b:2X},{a:2X})".format(x=event.x(),y=event.y(),r=c.red(),g=c.green(),b=c.blue(),a=c.alpha())
+		self.label.setText(t)
+
+class XMagQWidget(QWidget):
+	replace=False
+
+	def setParent(self,parent):
+		self.parent=parent
+
+	def mouseReleaseEvent(self,event):
+		print("xmagqwidget release")
+		if self.replace==False:
+			return
+		self.replace=False
+		self.releaseMouse()
+		self.parent.update(event.globalPos())
+
+	def update(self,tf):
+		print("xmagqwidget update")
+		self.replace=tf
+
+	def screen(self):
+		return QApplication.primaryScreen()
+
+
+class pyqtmag:
+	def __init__(self):
+		self.app=QApplication(sys.argv)
+		self.w=XMagQWidget()
+		self.w.setGeometry(100,100,200,200)
+		self.w.setWindowTitle('PyQtMag')
+		self.screen=self.w.screen()
+
+		self.layout=QGridLayout()
+		self.w.setLayout(self.layout)
+
+		self.quit=QPushButton("Quit")
+		self.quit.clicked.connect(self.quit_cb)
+
+		self.layout.addWidget(self.quit,1,1,1,1)
+
+		self.replace=QPushButton("Replace")
+		self.replace.clicked.connect(self.replace_cb)
+
+		self.layout.addWidget(self.replace,1,2,1,1)
+
+		self.label=XMagQLabel()
+		self.qimage=QImage()
+		self.layout.addWidget(self.label,2,1,1,2)
+
+		self.info=QLabel("Color")
+		self.layout.addWidget(self.info,3,1,1,2)
+
+		self.label.setLabel(self.info)
+		self.label.setqimage(self.qimage)
+
+		self.rootwindow=QX11Info.appRootWindow()
+
+		self.w.show()
+
+		self.window=self.app.allWindows()
+		self.w.setParent(self)
+
+	def start(self):
+		self.app.exec_()
+
+	def quit_cb(self):
+		quit()
+
+	def replace_cb(self):
+		print("replace_cb")
+		# Allow mouse to move around to grab a spot
+		pm=QPixmap('cursor.png')
+		cursor=QCursor(pm,hotX=0,hotY=0)
+		self.w.grabMouse(cursor)
+		self.w.update(True)
+
+	def update(self,pos):
+		self.pixmap=self.screen.grabWindow(self.rootwindow,pos.x(),pos.y(),50,50)
+		self.size=QSize(200,200)
+		self.pixmap_scaled=self.pixmap.scaled(self.size)
+		self.qimage=self.pixmap_scaled.toImage()
+		self.label.setPixmap(self.pixmap_scaled)
+		self.label.setqimage(self.qimage)
+
+if __name__=='__main__':
+	app=pyqtmag()
+	app.start()
+
