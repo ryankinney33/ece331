@@ -45,6 +45,9 @@ class XMagQWidget(QWidget):
 		self.replace=tf
 
 class pyqtmag:
+	scale_factor = 400 # 400 percent
+	image_present = False
+
 	def __init__(self):
 		# Create the window and set the size/position/title appropriately
 		self.app=QApplication(sys.argv)
@@ -62,27 +65,40 @@ class pyqtmag:
 		self.replace.clicked.connect(self.replace_cb)
 		self.layout.addWidget(self.replace,1,1,1,1)
 
+		# A slider to adjust the scaling
+		self.slider = QSlider(Qt.Horizontal)
+		self.slider.setFocusPolicy(Qt.StrongFocus)
+
+		# Minimum and maximum values = scaling %
+		self.slider.setMinimum(100)
+		self.slider.setMaximum(1500);
+		self.slider.setValue(self.scale_factor)
+		self.slider.setTickPosition(QSlider.TicksBothSides)
+		self.slider.setTickInterval(100)
+		self.slider.sliderReleased.connect(self.change_scale)
+		self.layout.addWidget(self.slider, 2,1,1,2)
+
 		# Add a widget to show the captured image
 		self.label=XMagQLabel()
 		self.qimage=QImage()
-		self.layout.addWidget(self.label,2,1,1,2)
+		self.layout.addWidget(self.label,3,1,1,2)
 		self.label.setqimage(self.qimage)
 
 		# A widget to show the color of a pixel in the image
 		self.info=QLabel("Color")
-		self.layout.addWidget(self.info,3,1,1,2)
+		self.layout.addWidget(self.info,4,1,1,2)
 		self.label.setLabel(self.info)
 
 
 		# Add a quit button to the gui
 		self.quit=QPushButton("Quit")
 		self.quit.clicked.connect(self.quit_cb)
-		self.layout.addWidget(self.quit,4,2,1,1)
+		self.layout.addWidget(self.quit,5,2,1,1)
 
 		# Add an option to save the grabbed image
 		self.save = QPushButton("Save")
 		self.save.clicked.connect(self.save_img)
-		self.layout.addWidget(self.save,4,1,1,1)
+		self.layout.addWidget(self.save,5,1,1,1)
 
 		# Show the window
 		self.rootwindow=QX11Info.appRootWindow()
@@ -105,10 +121,14 @@ class pyqtmag:
 
 	# Save the captured (unscaled) image to a file
 	def save_img(self):
+		if not self.image_present:
+			print('Error: no image captured', file = sys.stderr)
+			return
+
 		# Open a save file dialogue for the user
 		name,_ = QFileDialog.getSaveFileName(None, 'Save file', 'screenshot.png', '*.png')
 
-		if (name): # do nothing if no name was selected (dialog closed?)
+		if name: # do nothing if no name was selected (dialog closed?)
 			# Attempt to save the file
 			try:
 				self.pixmap.save(name, 'PNG')
@@ -116,19 +136,32 @@ class pyqtmag:
 			except Exception as e:
 				print(e, file = sys.stderr)
 
+	def change_scale(self):
+		self.scale_factor = self.slider.value()
+		self.scale_image()
+
+	def scale_image(self):
+		if self.image_present:
+			# Scale the image based on the scale factor (pyqt**MAG**)
+			pix_size = 50*self.scale_factor//100
+			self.size=QSize(pix_size, pix_size)
+			self.pixmap_scaled=self.pixmap.scaled(self.size)
+			self.qimage=self.pixmap_scaled.toImage()
+
+			# Show the scaled image
+			self.label.setPixmap(self.pixmap_scaled)
+			self.label.setqimage(self.qimage)
+			self.w.setFixedSize(self.layout.sizeHint()) # Automatically fix the window size
 
 	def update(self,pos):
+		self.image_present = True
+
 		# Grab a 50x50 pixel image at the cursor location (cursor at top left corner)
 		self.pixmap=self.screen.grabWindow(self.rootwindow,pos.x(),pos.y(),50,50)
 
-		# Scale the image up to 200x200 for displaying (pyqt**MAG**)
-		self.size=QSize(200,200)
-		self.pixmap_scaled=self.pixmap.scaled(self.size)
-		self.qimage=self.pixmap_scaled.toImage()
+		# Scale and show the image
+		self.scale_image()
 
-		# Show the scaled image
-		self.label.setPixmap(self.pixmap_scaled)
-		self.label.setqimage(self.qimage)
 
 if __name__=='__main__':
 	app=pyqtmag()
