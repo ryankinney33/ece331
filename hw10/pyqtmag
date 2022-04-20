@@ -35,7 +35,6 @@ class XMagQWidget(QWidget):
 		self.parent=parent
 
 	def mouseReleaseEvent(self,event):
-		print("xmagqwidget release")
 		if self.replace==False:
 			return
 		self.replace=False
@@ -43,44 +42,51 @@ class XMagQWidget(QWidget):
 		self.parent.update(event.globalPos())
 
 	def update(self,tf):
-		print("xmagqwidget update")
 		self.replace=tf
 
 class pyqtmag:
 	def __init__(self):
+		# Create the window and set the size/position/title appropriately
 		self.app=QApplication(sys.argv)
 		self.w=XMagQWidget()
 		self.w.setGeometry(100,100,200,200)
 		self.w.setWindowTitle('PyQtMag')
 		self.screen=self.app.primaryScreen()
 
+		# Add a grid-style layout for the widgets
 		self.layout=QGridLayout()
 		self.w.setLayout(self.layout)
 
-		self.quit=QPushButton("Quit")
-		self.quit.clicked.connect(self.quit_cb)
-
-		self.layout.addWidget(self.quit,1,1,1,1)
-
+		# Add a button to replace the grabbed image
 		self.replace=QPushButton("Replace")
 		self.replace.clicked.connect(self.replace_cb)
+		self.layout.addWidget(self.replace,1,1,1,1)
 
-		self.layout.addWidget(self.replace,1,2,1,1)
-
+		# Add a widget to show the captured image
 		self.label=XMagQLabel()
 		self.qimage=QImage()
 		self.layout.addWidget(self.label,2,1,1,2)
-
-		self.info=QLabel("Color")
-		self.layout.addWidget(self.info,3,1,1,2)
-
-		self.label.setLabel(self.info)
 		self.label.setqimage(self.qimage)
 
+		# A widget to show the color of a pixel in the image
+		self.info=QLabel("Color")
+		self.layout.addWidget(self.info,3,1,1,2)
+		self.label.setLabel(self.info)
+
+
+		# Add a quit button to the gui
+		self.quit=QPushButton("Quit")
+		self.quit.clicked.connect(self.quit_cb)
+		self.layout.addWidget(self.quit,4,2,1,1)
+
+		# Add an option to save the grabbed image
+		self.save = QPushButton("Save")
+		self.save.clicked.connect(self.save_img)
+		self.layout.addWidget(self.save,4,1,1,1)
+
+		# Show the window
 		self.rootwindow=QX11Info.appRootWindow()
-
 		self.w.show()
-
 		self.window=self.app.allWindows()
 		self.w.setParent(self)
 
@@ -91,18 +97,36 @@ class pyqtmag:
 		quit()
 
 	def replace_cb(self):
-		print("replace_cb")
 		# Allow mouse to move around to grab a spot
 		pm=QPixmap('cursor.png')
 		cursor=QCursor(pm,hotX=0,hotY=0)
 		self.w.grabMouse(cursor)
 		self.w.update(True)
 
+	# Save the captured (unscaled) image to a file
+	def save_img(self):
+		# Open a save file dialogue for the user
+		name,_ = QFileDialog.getSaveFileName(None, 'Save file', 'screenshot.png', '*.png')
+
+		if (name): # do nothing if no name was selected (dialog closed?)
+			# Attempt to save the file
+			try:
+				self.pixmap.save(name, 'PNG')
+				print('Saved file as:', name)
+			except Exception as e:
+				print(e, file = sys.stderr)
+
+
 	def update(self,pos):
+		# Grab a 50x50 pixel image at the cursor location (cursor at top left corner)
 		self.pixmap=self.screen.grabWindow(self.rootwindow,pos.x(),pos.y(),50,50)
+
+		# Scale the image up to 200x200 for displaying (pyqt**MAG**)
 		self.size=QSize(200,200)
 		self.pixmap_scaled=self.pixmap.scaled(self.size)
 		self.qimage=self.pixmap_scaled.toImage()
+
+		# Show the scaled image
 		self.label.setPixmap(self.pixmap_scaled)
 		self.label.setqimage(self.qimage)
 

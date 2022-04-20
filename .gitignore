@@ -70,3 +70,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 *.db
+
+# Images
+*.png
