@@ -54,8 +54,6 @@ class pyqtmag:
 		self.w=XMagQWidget()
 		self.w.setGeometry(100,100,200,200)
 		self.w.setWindowTitle('PyQtMag')
-		self.screen=self.app.primaryScreen()
-	#	help(self.app)
 
 		# Add a grid-style layout for the widgets
 		self.layout=QGridLayout()
@@ -89,7 +87,6 @@ class pyqtmag:
 		self.info=QLabel("Color")
 		self.layout.addWidget(self.info,4,1,1,2)
 		self.label.setLabel(self.info)
-
 
 		# Add a quit button to the gui
 		self.quit=QPushButton("Quit")
@@ -158,17 +155,18 @@ class pyqtmag:
 
 		# Create a QRect for the wanted image
 		want = QRect(pos, QSize(50,50))
-
+		screen = self.app.screenAt(pos)
 		# The intersection of the screen and the wanted image gives the actual image
-		inter = want.intersected(self.screen.geometry())
+		inter = want.intersected(screen.geometry())
 
-		# Grab a 50x50 pixel image at the cursor location (cursor at top left corner)
-		self.pixmap=self.screen.grabWindow(self.rootwindow,inter.x(),inter.y(),inter.width(),inter.height())
+		# Grab an image at the cursor location (cursor at top left corner)
+		self.pixmap=screen.grabWindow(self.rootwindow,inter.x(),inter.y(),inter.width(),inter.height())
 
 		# Scale and show the image
 		self.scale_image()
 
 
+# Create the gui and start the app
 if __name__=='__main__':
 	app=pyqtmag()
 	app.start()
