@@ -55,6 +55,7 @@ class pyqtmag:
 		self.w.setGeometry(100,100,200,200)
 		self.w.setWindowTitle('PyQtMag')
 		self.screen=self.app.primaryScreen()
+	#	help(self.app)
 
 		# Add a grid-style layout for the widgets
 		self.layout=QGridLayout()
@@ -143,8 +144,7 @@ class pyqtmag:
 	def scale_image(self):
 		if self.image_present:
 			# Scale the image based on the scale factor (pyqt**MAG**)
-			pix_size = 50*self.scale_factor//100
-			self.size=QSize(pix_size, pix_size)
+			self.size= self.scale_factor//100 * self.pixmap.size()
 			self.pixmap_scaled=self.pixmap.scaled(self.size)
 			self.qimage=self.pixmap_scaled.toImage()
 
@@ -156,8 +156,14 @@ class pyqtmag:
 	def update(self,pos):
 		self.image_present = True
 
+		# Create a QRect for the wanted image
+		want = QRect(pos, QSize(50,50))
+
+		# The intersection of the screen and the wanted image gives the actual image
+		inter = want.intersected(self.screen.geometry())
+
 		# Grab a 50x50 pixel image at the cursor location (cursor at top left corner)
-		self.pixmap=self.screen.grabWindow(self.rootwindow,pos.x(),pos.y(),50,50)
+		self.pixmap=self.screen.grabWindow(self.rootwindow,inter.x(),inter.y(),inter.width(),inter.height())
 
 		# Scale and show the image
 		self.scale_image()
