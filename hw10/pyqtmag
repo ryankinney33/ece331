@@ -6,14 +6,17 @@ from PyQt5.QtGui import  *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtX11Extras import *
+from math import floor
 
 class XMagQLabel(QLabel):
 	def setLabel(self, label):
 		self.label=label
 
+	# Set the image being shown on the widget
 	def setqimage(self, qimage):
 		self.qimage=qimage
 
+	# Get the mouse position and display the color of the pixel
 	def mouseMoveEvent(self, event):
 		# Check bounds
 		if event.x()>=self.qimage.width():
@@ -34,6 +37,7 @@ class XMagQWidget(QWidget):
 	def setParent(self,parent):
 		self.parent=parent
 
+	# When the mouse button is released, get the screenshot at its position
 	def mouseReleaseEvent(self,event):
 		if self.replace==False:
 			return
@@ -41,12 +45,15 @@ class XMagQWidget(QWidget):
 		self.releaseMouse()
 		self.parent.update(event.globalPos())
 
+	# Set the flag for updating the image
 	def update(self,tf):
 		self.replace=tf
 
 class pyqtmag:
 	scale_factor = 400 # 400 percent
 	image_present = False
+	old_x = float("NaN")
+	old_y = float("NaN")
 
 	def __init__(self):
 		# Create the window and set the size/position/title appropriately
@@ -74,29 +81,38 @@ class pyqtmag:
 		self.slider.setValue(self.scale_factor)
 		self.slider.setTickPosition(QSlider.TicksBothSides)
 		self.slider.setTickInterval(100)
-		self.slider.sliderReleased.connect(self.change_scale)
-		self.layout.addWidget(self.slider, 2,1,1,2)
+		self.slider.sliderReleased.connect(self.change_scale_cb)
+		self.layout.addWidget(self.slider, 3,1,1,2)
 
 		# Add a widget to show the captured image
 		self.label=XMagQLabel()
 		self.qimage=QImage()
-		self.layout.addWidget(self.label,3,1,1,2)
+		self.layout.addWidget(self.label,4,1,1,2)
 		self.label.setqimage(self.qimage)
 
 		# A widget to show the color of a pixel in the image
 		self.info=QLabel("Color")
-		self.layout.addWidget(self.info,4,1,1,2)
+		self.layout.addWidget(self.info,5,1,1,2)
 		self.label.setLabel(self.info)
+
+		# Allow user to enter x and y coordinates
+		# Place holder text also shows current screenshot coordinates
+		self.enter_x = QLineEdit()
+		self.enter_x.setPlaceholderText('X...')
+		self.layout.addWidget(self.enter_x, 2,1,1,1)
+		self.enter_y = QLineEdit()
+		self.enter_y.setPlaceholderText('Y...')
+		self.layout.addWidget(self.enter_y, 2,2,1,1)
 
 		# Add a quit button to the gui
 		self.quit=QPushButton("Quit")
 		self.quit.clicked.connect(self.quit_cb)
-		self.layout.addWidget(self.quit,5,2,1,1)
+		self.layout.addWidget(self.quit,6,2,1,1)
 
 		# Add an option to save the grabbed image
 		self.save = QPushButton("Save")
 		self.save.clicked.connect(self.save_img)
-		self.layout.addWidget(self.save,5,1,1,1)
+		self.layout.addWidget(self.save,6,1,1,1)
 
 		# Show the window
 		self.rootwindow=QX11Info.appRootWindow()
@@ -110,12 +126,37 @@ class pyqtmag:
 	def quit_cb(self):
 		quit()
 
+	# Called when the replace button is clicked
+	# Gets input from the boxes, if they are invalid/empty, calls the function
+	# To get a screenshot from mouse input
 	def replace_cb(self):
-		# Allow mouse to move around to grab a spot
-		pm=QPixmap('cursor.png')
-		cursor=QCursor(pm,hotX=0,hotY=0)
-		self.w.grabMouse(cursor)
-		self.w.update(True)
+		try: # Fails if text boxes empty or non-numerical
+			x_str = self.enter_x.text()
+			y_str = self.enter_y.text()
+
+			# Try to read numbers from the strings
+			if x_str and y_str:
+				x = floor(float(x_str))
+				y = floor(float(y_str))
+			elif x_str:
+				x = floor(float(x_str))
+				y = self.old_y
+			elif y_str:
+				x = self.old_x
+				y = floor(float(y_str))
+			else:
+				raise Exception
+
+			# Get screenshot if the positions changed
+			if x != self.old_x or y != self.old_y:
+				self.update(QPoint(x,y))
+
+		except: # This also gets executed if the entered coordinates are out-of-bounds
+			# Allow mouse to move around to grab a spot
+			pm=QPixmap('cursor.png')
+			cursor=QCursor(pm,hotX=0,hotY=0)
+			self.w.grabMouse(cursor)
+			self.w.update(True)
 
 	# Save the captured (unscaled) image to a file
 	def save_img(self):
@@ -134,10 +175,12 @@ class pyqtmag:
 			except Exception as e:
 				print(e, file = sys.stderr)
 
-	def change_scale(self):
+	# Called when the user drags the scale slider; rescales the image
+	def change_scale_cb(self):
 		self.scale_factor = self.slider.value()
 		self.scale_image()
 
+	# Function to rescale the image
 	def scale_image(self):
 		if self.image_present:
 			# Scale the image based on the scale factor (pyqt**MAG**)
@@ -150,8 +193,20 @@ class pyqtmag:
 			self.label.setqimage(self.qimage)
 			self.w.setFixedSize(self.layout.sizeHint()) # Automatically fix the window size
 
+	# Get the screenshot from at the passed position, scale and display it
 	def update(self,pos):
 		self.image_present = True
+
+		# Set the old positions
+		self.old_x = pos.x()
+		self.old_y = pos.y()
+
+		# Display the new coordinates in the text boxes
+		self.enter_x.setPlaceholderText('X: {}'.format(self.old_x))
+		self.enter_y.setPlaceholderText('Y: {}'.format(self.old_y))
+
+		self.enter_x.clear()
+		self.enter_y.clear()
 
 		# Create a QRect for the wanted image
 		want = QRect(pos, QSize(50,50))
