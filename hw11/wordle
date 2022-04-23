@@ -1,0 +1,11 @@
+#!/usr/bin/python3
+import re
+# Read in entire dictionary
+with open("/usr/share/dict/words") as f:
+    w=f.readlines()
+
+r1 = [m.string for l in w for m in [re.search(r'^[abcfh-mo-ru-xz][abcfhj-mo-ru-xz][abcfh-mo-ru-xz][bcfh-mo-ru-xz][abcfh-kmo-ru-xz]$', l.strip())] if m]
+r2 = [m.string for l in r1 for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l.strip())] if m]
+
+
+print(r2)
