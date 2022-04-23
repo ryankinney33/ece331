@@ -4,7 +4,15 @@ import re
 with open("/usr/share/dict/words") as f:
     w=f.readlines()
 
+# Remove all non-word characters
+w = [m.string for l in w for m in [re.search(r'^\w{5}$', l.strip())] if m]
+
+# Remove capital letters and d, s, t, e, n, g, and y
 w = [m.string for l in w for m in [re.search(r'^[^A-Zdstengy]{5}$', l.strip())] if m]
+
+# Only match strings with an a, i, and l
 w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)',l.strip())] if m]
+
+# Remove strings with letters in positions they can't be in
 [print(m.string) for l in w for m in [re.search(r'.[^i].[^a][^l]', l.strip())] if m]
 
