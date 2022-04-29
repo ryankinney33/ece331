@@ -23,6 +23,34 @@ w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
 
 3.
 
+4.
+    Example 1:
+	IP = 2.201.50.25
+	NM = /11 = 255.224.0.0
+	NA = IP & NM = 2.201.50.45 & 255.224.0.0 = 2.192.0.0
+	BA = NA | ~NM = 2.192.0.0 | 0.31.255.255 = 2.223.255.255
+    Example 2:
+	NA = 105.223.0.0
+	BA = 105.223.31.255
+	IP = NA + 1 to BA - 1 ==> 105.223.0.31 is an example
+	NM = ~BA | NA = 150.32.224.0 | 105.223.0.0 = 255.255.224.0 = /19
+  ----------------------------------------------------------------------------
+  |  Network (DDN)  |       IP (DDN)       | Netmask(CIDR) | Broadcast (DDN) |
+  |-----------------|----------------------|---------------|-----------------|
+  |    2.192.0.0    |      2.201.50.45     |      /11      |  2.223.255.255  |
+  |-----------------|----------------------|---------------|-----------------|
+  |   105.223.0.0   |     105.223.0.31     |      /19      | 105.223.31.255  |
+  ---------------------------------------------------------------------------
 
+5.
+
+6.
+    a.
+	CREATE TABLE albums(Date TEXT, Time TEXT, Artist TEXT, Album TEXT,
+                            Song TEXT, Album_num INTEGER);
+    b.
+	INSERT INTO albums(Date, Time, Artist, Album, Song, Album_num)
+	VALUES("04-25-2019", "08:01:45", "Meatloaf", "Bat Out of Hell",
+	       "Objects", 34874);
 7.
-    enscript ECE331_hw10.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
+    enscript ECE331_hw11.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
