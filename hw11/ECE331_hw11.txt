@@ -22,7 +22,18 @@ w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
 [print(m.string) for l in w for m in [re.search(r'.[^i].[^a][^l]', l)] if m]
 
 3.
-
+    a.
+	I would notify my supervisor abotu the incident. I would then check for
+	any unknown processes or services that are running, which could be
+	rootkits, for example. I would then check the firewall settings and
+	other system logs for information about what happened.
+    b.
+	I would notify both Adam and my supervisor about the incident. If
+	permitted, I would correct the firewall settings and stop the
+	malicious services and processes if I can find them. I would then
+	secure the passphrase for Adam's account. Because this may destroy
+	evidence, I would not restore from a backup unless I was expressly
+	told to because that may destroy evidence.
 4.
     Example 1:
 	IP = 2.201.50.25
