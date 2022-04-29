@@ -1,0 +1,28 @@
+1.
+    The cron job runs on the 8th minute past every 6 hours on the following days:
+    Tuesdays, Thursdays, Saturdays, and the 5th day of every month.
+
+    In summary, it runs at 12:08 AM, 6:08 AM, 12:08 PM, and 6:08 PM on Tuesdays,
+    Thursdays, Saturdays, and the 5th day of every month.
+
+2.
+#!/usr/bin/python3
+import re
+# Read in entire dictionary
+with open("/usr/share/dict/words") as f:
+    w=f.readlines()
+
+# Match strings without capital letters, symbols, and d, s, t, e, n, g, and y
+w=[m.string for l in w for m in [re.search(r'^[^\WA-Zdstengy]{5}$',l.strip())]if m]
+
+# Match strings with an a, i, and l
+w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
+
+# Match strings without i, a, and l in the positions they can't be in
+[print(m.string) for l in w for m in [re.search(r'.[^i].[^a][^l]', l)] if m]
+
+3.
+
+
+7.
+    enscript ECE331_hw10.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
