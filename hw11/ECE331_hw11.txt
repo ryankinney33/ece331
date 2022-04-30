@@ -23,7 +23,7 @@ w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
 
 3.
     a.
-	I would notify my supervisor abotu the incident. I would then check for
+	I would notify my supervisor about the incident. I would then check for
 	any unknown processes or services that are running, which could be
 	rootkits, for example. I would then check the firewall settings and
 	other system logs for information about what happened.
@@ -34,6 +34,7 @@ w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
 	secure the passphrase for Adam's account. Because this may destroy
 	evidence, I would not restore from a backup unless I was expressly
 	told to because that may destroy evidence.
+
 4.
     Example 1:
 	IP = 2.201.50.25
@@ -72,9 +73,21 @@ w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
 	"return -EINVAL" in the block where lcd_dwrite('X') returns nonzero.
 	Also the code dedicated to error handling is not called in that case too.
 	Instead of returning -EINVAL, ret should be set to -EINVAL (ret = -EINVAL)
-	and instead of returning, "goto fail;" should be used. To fix
-	the undefined behavior of releasing an unacquired lock, simply remove
-	the mutex_unlock(&lcd_lock) from the interrupted system call case.
+	and instead of returning, "goto fail;" should be used. That may look
+	like the following:
+	if (lcd_dwrite('X') != 0) {
+		mutex_unlock(&lcd_lock);
+		ret = -EINVAL;
+		goto fail;
+	}
+
+	To fix the undefined behavior of releasing an unacquired lock, simply
+	remove the mutex_unlock(&lcd_lock) from the interrupted system call case.
+	That may look like the following:
+	if (ret != 0) {
+		ret = -EINTR;
+		goto fail;
+	}
 
 6.
     a.
@@ -86,5 +99,6 @@ w=[m.string for l in w for m in [re.search(r'(?=.*a)(?=.*i)(?=.*l)', l)] if m]
 	       "Objects", 34874);
     c.
 	SELECT * FROM albums WHERE Album_num > 10000;
+
 7.
     enscript ECE331_hw11.txt -b '$n %E $C|$%|Ryan Kinney' -f Courier11 -F Courier11
